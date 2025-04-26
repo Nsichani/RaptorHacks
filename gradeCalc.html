@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finals Buddy - Grade Calculator</title>
+    <style>
+    :root {
+        /* Choose your preferred primary, secondary, etc. */
+        --primary: #4f46e5; /* from second sheet, previously #1e3a8a */
+        --primary-dark: #3730a3;
+        --secondary: #6366f1; /* from second sheet, previously #3b82f6 */
+        --accent: #a5b4fc;    /* from second sheet, previously #93c5fd */
+        --light: #f8fafc;
+        --dark: #1e1b4b;      /* from second sheet, previously #0f172a */
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #334155;
+        background-color: var(--light);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    header {
+        background-color: var(--primary);
+        color: white;
+        text-align: center;
+        padding: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .logo {
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    .nav-links {
+        display: flex;
+        gap: 1.5rem;
+    }
+
+    .nav-links a {
+        color: white;
+        text-decoration: none;
+        font-weight: 600;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        transition: background-color 0.2s, opacity 0.2s;
+    }
+
+    .nav-links a:hover {
+        background-color: var(--secondary);
+        opacity: 0.8;
+    }
+
+    .subtitle {
+        font-size: 1.2rem;
+        margin-top: 0.5rem;
+        opacity: 0.9;
+    }
+
+    .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 2rem 1.5rem;
+        flex-grow: 1;
+    }
+
+    .card {
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .card h3 {
+        color: var(--primary);
+        margin-bottom: 1rem;
+        font-size: 1.3rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .checkbox-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem 1.5rem;
+        margin-top: 0.5rem;
+    }
+
+    .checkbox-label {
+        display: flex;
+        align-items: center;
+        font-weight: normal;
+        cursor: pointer;
+    }
+
+    input[type="checkbox"] {
+        margin-right: 0.5rem;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 1rem;
+        background-color: white;
+    }
+
+    button,
+    .btn {
+        background-color: var(--secondary);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        font-weight: 600;
+        text-align: center;
+    }
+
+    button:hover,
+    .btn:hover {
+        background-color: var(--primary);
+    }
+
+    .btn-block {
+        display: block;
+        width: 100%;
+    }
+
+    .result,
+    .result-container {
+        background-color: var(--accent);
+        border-radius: 8px;
+        padding: 1.5rem;
+        text-align: center;
+        display: none;
+        margin-top: 2rem;
+    }
+
+    .result.show {
+        display: block;
+        animation: fadeIn 0.5s;
+    }
+
+    .exam-date {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .exam-time {
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+
+    .exceptions,
+    .demo-notice {
+        background-color: #fef2f2;
+        border-left: 4px solid var(--danger);
+        padding: 1rem;
+        margin-top: 2rem;
+        border-radius: 4px;
+    }
+
+    .exceptions h3 {
+        margin-top: 0;
+        color: var(--danger);
+    }
+
+    .exceptions ul {
+        margin-bottom: 0;
+        padding-left: 1.5rem;
+    }
+
+    .error {
+        color: var(--danger);
+        background-color: #fef2f2;
+        padding: 1rem;
+        border-radius: 4px;
+        margin-top: 1rem;
+        display: none;
+    }
+
+    .page-title {
+        text-align: center;
+        margin-bottom: 2rem;
+        color: var(--primary);
+    }
+
+    .instruction-steps ol {
+        padding-left: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .instruction-steps li {
+        margin-bottom: 0.5rem;
+    }
+
+    .upload-container {
+        border: 2px dashed #ccc;
+        padding: 2rem;
+        text-align: center;
+        border-radius: 8px;
+        background-color: #f9fafb;
+        margin-bottom: 1.5rem;
+        position: relative;
+        transition: border-color 0.3s;
+    }
+
+    .upload-icon {
+        display: block;
+        margin: 0 auto 1rem;
+        width: 60px;
+        height: 60px;
+        color: #9ca3af;
+    }
+
+    .upload-text {
+        margin-bottom: 1rem;
+        color: #6b7280;
+    }
+
+    .or-divider {
+        display: flex;
+        align-items: center;
+        margin: 1.5rem 0;
+    }
+
+    .or-divider::before,
+    .or-divider::after {
+        content: "";
+        flex-grow: 1;
+        background-color: #ccc;
+        height: 1px;
+    }
+
+    .or-divider span {
+        padding: 0 1rem;
+        color: #777;
+        font-weight: 500;
+    }
+
+    .grade-categories {
+        margin-top: 1.5rem;
+    }
+
+    .category-header,
+    .category-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.75rem;
+        background-color: #f1f5f9;
+        border-radius: 4px;
+        margin-bottom: 1rem;
+        font-weight: 600;
+    }
+
+    .category-row {
+        border-bottom: 1px solid #ddd;
+    }
+
+    .category-row:last-child {
+        border-bottom: none;
+    }
+
+    .category-name {
+        flex-basis: 40%;
+    }
+
+    .category-weight,
+    .current-grade {
+        flex-basis: 20%;
+        text-align: center;
+    }
+
+    .add-category {
+        display: flex;
+        align-items: center;
+        margin-top: 1rem;
+        color: var(--secondary);
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .add-category svg {
+        margin-right: 0.5rem;
+        width: 16px;
+        height: 16px;
+    }
+
+    .result-grade {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--secondary);
+        margin: 1rem 0;
+    }
+
+    .result-message {
+        margin-bottom: 0;
+    }
+
+    .delete-category {
+        margin-left: 10px;
+        color: var(--danger);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    footer {
+        background-color: var(--dark);
+        color: white;
+        padding: 1.5rem;
+        text-align: center;
+    }
+
+    .footer-links {
+        margin-bottom: 1rem;
+    }
+
+    .footer-links a {
+        color: var(--accent);
+        text-decoration: none;
+        margin: 0 0.75rem;
+    }
+
+    .footer-links a:hover {
+        text-decoration: underline;
+    }
+
+    .copyright {
+        opacity: 0.75;
+        font-size: 0.9rem;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @media (max-width: 768px) {
+        .card {
+            padding: 1.5rem;
+        }
+
+        .category-header, .category-row {
+            font-size: 0.9rem;
+        }
+
+        .checkbox-group {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+    }
+</style>
+
+</head>
+<body>
+    <header>
+        <div class="logo">Finals Buddy</div>
+        <div class="nav-links">
+            <a href="homePage.html">Home</a>
+            <a href="nima.html">Exam Schedule</a>
+            <a href="gradeCalc.html">Grade Calculator</a>
+            <a href="pomodoroTimer.html">Pomodoro Timer</a>
+        </div>
+    </header>
+
+    
+    <div class="container">
+        <h1 class="page-title">Grade Calculator</h1>
+        
+        <div class="card">
+            <h3>Upload Your Syllabus (Demo Feature)</h3>
+            
+            <div class="demo-notice">
+                <strong>Note:</strong> The syllabus upload feature is currently a demonstration. In this demo version, clicking the "Try Demo" button will populate the form with sample data for demonstration purposes.
+            </div>
+            
+            <div class="upload-container">
+                <svg class="upload-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                <p class="upload-text">Syllabus upload feature coming soon!</p>
+                <button id="demoButton" class="btn">Try Demo</button>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h3>Calculate Your Final Exam Grade</h3>
+            <p>Enter your current grades and the weight of each category to calculate what you need on the final exam.</p>
+            
+            <div class="form-group">
+                <label for="courseName">Course Name</label>
+                <input type="text" id="courseName" placeholder="e.g., Introduction to Psychology">
+            </div>
+            
+            <div class="form-group">
+                <label for="targetGrade">Target Overall Grade</label>
+                <input type="number" id="targetGrade" min="0" max="100" step="0.1" placeholder="e.g., 90.0">
+            </div>
+            
+            <div class="form-group">
+                <label for="finalExamWeight">Final Exam Weight (%)</label>
+                <input type="number" id="finalExamWeight" min="0" max="100" step="0.1" placeholder="e.g., 25.0">
+            </div>
+            
+            <div class="grade-categories">
+                <div class="category-header">
+                    <div class="category-name">Category</div>
+                    <div class="category-weight">Weight (%)</div>
+                    <div class="current-grade">Current Grade (%)</div>
+                </div>
+                
+                <div id="categoryContainer">
+                    <div class="category-row">
+                        <div class="category-name">
+                            <input type="text" placeholder="e.g., Midterm Exams">
+                        </div>
+                        <div class="category-weight">
+                            <input type="number" min="0" max="100" step="0.1" placeholder="25.0">
+                        </div>
+                        <div class="current-grade">
+                            <input type="number" min="0" max="100" step="0.1" placeholder="85.0">
+                        </div>
+                    </div>
+                    
+                    <div class="category-row">
+                        <div class="category-name">
+                            <input type="text" placeholder="e.g., Homework">
+                        </div>
+                        <div class="category-weight">
+                            <input type="number" min="0" max="100" step="0.1" placeholder="15.0">
+                        </div>
+                        <div class="current-grade">
+                            <input type="number" min="0" max="100" step="0.1" placeholder="90.0">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="add-category" id="addCategory">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="16"></line>
+                        <line x1="8" y1="12" x2="16" y2="12"></line>
+                    </svg>
+                    Add Another Category
+                </div>
+            </div>
+            
+            <button class="btn btn-block" id="calculateButton">Calculate Needed Final Exam Grade</button>
+            
+            <div class="result-container" id="resultContainer">
+                <h3>Final Exam Grade Needed</h3>
+                <div class="result-grade" id="resultGrade">92.5%</div>
+                <p class="result-message" id="resultMessage">You need to score at least a 92.5% on your final exam to achieve your target grade of 90% in the course.</p>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="footer-links">
+            <a href="homePage.html">Home</a>
+            <a href="nima.html">Exam Schedule</a>
+            <a href="gradeCalc.html">Grade Calculator</a>
+            <a href="pomodoroTimer.html">Pomodoro Timer</a>
+        </div>
+        <div class="copyright">© 2025 Finals Buddy. Created by students, for students.</div>
+    </footer>
+
+    <script>
+        // Demo button functionality
+        const demoButton = document.getElementById('demoButton');
+        
+        demoButton.addEventListener('click', () => {
+            // Populate form with sample data
+            document.getElementById('courseName').value = "Introduction to Psychology";
+            document.getElementById('targetGrade').value = "90.0";
+            document.getElementById('finalExamWeight').value = "25.0";
+            
+            // Clear existing categories
+            const categoryContainer = document.getElementById('categoryContainer');
+            categoryContainer.innerHTML = '';
+            
+            // Add sample categories
+            const categories = [
+                {name: "Midterm Exams", weight: 30, grade: 88},
+                {name: "Homework", weight: 25, grade: 92},
+                {name: "Quizzes", weight: 10, grade: 85},
+                {name: "Participation", weight: 10, grade: 95}
+            ];
+            
+            categories.forEach(category => {
+                addCategoryRow(category.name, category.weight, category.grade);
+            });
+            
+            alert("Demo data loaded successfully!");
+        });
+        
+        // Add category row functionality
+        const addCategoryButton = document.getElementById('addCategory');
+        
+        addCategoryButton.addEventListener('click', () => {
+            addCategoryRow('', '', '');
+        });
+        
+        function addCategoryRow(name = '', weight = '', grade = '') {
+            const categoryContainer = document.getElementById('categoryContainer');
+            
+            const newRow = document.createElement('div');
+            newRow.className = 'category-row';
+            
+            // Create category name input
+            const nameDiv = document.createElement('div');
+            nameDiv.className = 'category-name';
+            const nameInput = document.createElement('input');
+            nameInput.type = 'text';
+            nameInput.placeholder = 'e.g., Quizzes';
+            nameInput.value = name;
+            nameDiv.appendChild(nameInput);
+            
+            // Create weight input
+            const weightDiv = document.createElement('div');
+            weightDiv.className = 'category-weight';
+            const weightInput = document.createElement('input');
+            weightInput.type = 'number';
+            weightInput.min = '0';
+            weightInput.max = '100';
+            weightInput.step = '0.1';
+            weightInput.placeholder = '10.0';
+            weightInput.value = weight;
+            weightDiv.appendChild(weightInput);
+            
+            // Create grade input
+            const gradeDiv = document.createElement('div');
+            gradeDiv.className = 'current-grade';
+            const gradeInput = document.createElement('input');
+            gradeInput.type = 'number';
+            gradeInput.min = '0';
+            gradeInput.max = '100';
+            gradeInput.step = '0.1';
+            gradeInput.placeholder = '85.0';
+            gradeInput.value = grade;
+            gradeDiv.appendChild(gradeInput);
+            
+            // Add delete button
+            const deleteButton = document.createElement('div');
+            deleteButton.className = 'delete-category';
+            deleteButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
+            deleteButton.addEventListener('click', function() {
+                categoryContainer.removeChild(newRow);
+            });
+            
+            // Append all elements to the row
+            newRow.appendChild(nameDiv);
+            newRow.appendChild(weightDiv);
+            newRow.appendChild(gradeDiv);
+            newRow.appendChild(deleteButton);
+            
+            // Add the new row to the container
+            categoryContainer.appendChild(newRow);
+        }
+        
+        // Calculate button functionality
+        const calculateButton = document.getElementById('calculateButton');
+        
+        calculateButton.addEventListener('click', () => {
+            // Get input values
+            const targetGrade = parseFloat(document.getElementById('targetGrade').value);
+            const finalExamWeight = parseFloat(document.getElementById('finalExamWeight').value);
+            const courseName = document.getElementById('courseName').value || 'this course';
+            
+            // Get all category rows
+            const categoryRows = document.querySelectorAll('.category-row');
+            let totalWeight = 0;
+            let weightedGrade = 0;
+            
+            // Calculate current weighted grade
+            categoryRows.forEach(row => {
+                const categoryWeight = parseFloat(row.querySelector('.category-weight input').value);
+                const categoryGrade = parseFloat(row.querySelector('.current-grade input').value);
+                
+                if (!isNaN(categoryWeight) && !isNaN(categoryGrade)) {
+                    totalWeight += categoryWeight;
+                    weightedGrade += (categoryGrade * (categoryWeight / 100));
+                }
+            });
+            
+            // Calculate required final exam grade
+            const remainingWeight = 100 - totalWeight;
+            
+            if (remainingWeight !== finalExamWeight) {
+                alert("Warning: The sum of all category weights plus the final exam weight should equal 100%. Please check your weights.");
+                return;
+            }
+            
+            const requiredFinalScore = ((targetGrade - weightedGrade) / (finalExamWeight / 100)).toFixed(1);
+            
+            // Display result
+            document.getElementById('resultGrade').textContent = requiredFinalScore + "%";
+            document.getElementById('resultMessage').textContent = 
+                `You need to score at least ${requiredFinalScore}% on your final exam to achieve your target grade of ${targetGrade}% in ${courseName}.`;
+            
+            document.getElementById('resultContainer').style.display = 'block';
+        });
+    </script>
+</body>
+</html>
