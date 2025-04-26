@@ -350,7 +350,9 @@
                 <button class="btn btn-reset" id="reset-btn">Reset</button>
             </div>
         </div>
-        
+	<audio id="myAudio">
+        	<source src="AriaMath.mp3" type="audio/mpeg">
+	</audio>
         <div class="pomodoro-settings">
             <h3 class="settings-title">Timer Settings</h3>
             <div class="settings-grid">
@@ -431,6 +433,7 @@
         const resetBtn = document.getElementById('reset-btn');
         const progressBar = document.getElementById('progress-bar');
         const saveSettingsBtn = document.getElementById('save-settings');
+	var x = document.getElementById("myAudio");
         
         // Format time function (converts seconds to MM:SS format)
         function formatTime(seconds) {
@@ -463,6 +466,7 @@
         
         // Start timer function
         function startTimer() {
+	    x.play();
             isRunning = true;
             startBtn.disabled = true;
             pauseBtn.disabled = false;
@@ -510,6 +514,7 @@
         function pauseTimer() {
             clearInterval(timerInterval);
             isRunning = false;
+	    x.pause();
             startBtn.disabled = false;
             pauseBtn.disabled = true;
         }
