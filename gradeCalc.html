@@ -511,7 +511,7 @@
         
         demoButton.addEventListener('click', () => {
             var min = Math.ceil(1);
-            var max = Math.floor(2);
+            var max = Math.floor(4);
             var randomNum = Math.floor(Math.random() * (max - min + 1)) + min;
             if (randomNum == 1) {
                 // Populate form with sample data
@@ -551,6 +551,48 @@
                     {name: "Homework", weight: 25, grade: 90},
                     {name: "Quizzes", weight: 10, grade: 80},
                     {name: "Participation", weight: 10, grade: 95}
+                ];
+                
+                categories.forEach(category => {
+                    addCategoryRow(category.name, category.weight, category.grade);
+                });
+            }
+
+            if (randomNum == 3) {
+                // Populate form with sample data
+                document.getElementById('courseName').value = "CMSC 204";
+                document.getElementById('targetGrade').value = "70.0";
+                document.getElementById('finalExamWeight').value = "90.0";
+                
+                // Clear existing categories
+                const categoryContainer = document.getElementById('categoryContainer');
+                categoryContainer.innerHTML = '';
+                
+                // Add sample categories
+                const categories = [
+                    {name: "Participation", weight: 10, grade: 10}
+                ];
+                
+                categories.forEach(category => {
+                    addCategoryRow(category.name, category.weight, category.grade);
+                });
+            }
+
+            if (randomNum == 4) {
+                // Populate form with sample data
+                document.getElementById('courseName').value = "CMSC 204";
+                document.getElementById('targetGrade').value = "90.0";
+                document.getElementById('finalExamWeight').value = "10.0";
+                
+                // Clear existing categories
+                const categoryContainer = document.getElementById('categoryContainer');
+                categoryContainer.innerHTML = '';
+                
+                // Add sample categories
+                const categories = [
+                    {name: "Midterm Exams", weight: 70, grade: 80},
+                    {name: "Homework", weight: 10, grade: 90},
+                    {name: "Quizzes", weight: 10, grade: 80},
                 ];
                 
                 categories.forEach(category => {
