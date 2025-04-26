@@ -510,28 +510,53 @@
         const demoButton = document.getElementById('demoButton');
         
         demoButton.addEventListener('click', () => {
-            // Populate form with sample data
-            document.getElementById('courseName').value = "Introduction to Psychology";
-            document.getElementById('targetGrade').value = "90.0";
-            document.getElementById('finalExamWeight').value = "25.0";
-            
-            // Clear existing categories
-            const categoryContainer = document.getElementById('categoryContainer');
-            categoryContainer.innerHTML = '';
-            
-            // Add sample categories
-            const categories = [
-                {name: "Midterm Exams", weight: 30, grade: 88},
-                {name: "Homework", weight: 25, grade: 92},
-                {name: "Quizzes", weight: 10, grade: 85},
-                {name: "Participation", weight: 10, grade: 95}
-            ];
-            
-            categories.forEach(category => {
-                addCategoryRow(category.name, category.weight, category.grade);
-            });
-            
-            alert("Demo data loaded successfully!");
+            var min = Math.ceil(1);
+            var max = Math.floor(2);
+            var randomNum = Math.floor(Math.random() * (max - min + 1)) + min;
+            if (randomNum == 1) {
+                // Populate form with sample data
+                document.getElementById('courseName').value = "Introduction to Psychology";
+                document.getElementById('targetGrade').value = "90.0";
+                document.getElementById('finalExamWeight').value = "25.0";
+                
+                // Clear existing categories
+                const categoryContainer = document.getElementById('categoryContainer');
+                categoryContainer.innerHTML = '';
+                
+                // Add sample categories
+                const categories = [
+                    {name: "Midterm Exams", weight: 30, grade: 88},
+                    {name: "Homework", weight: 25, grade: 92},
+                    {name: "Quizzes", weight: 10, grade: 85},
+                    {name: "Participation", weight: 10, grade: 95}
+                ];
+                
+                categories.forEach(category => {
+                    addCategoryRow(category.name, category.weight, category.grade);
+                });
+            }
+            if (randomNum == 2) {
+                // Populate form with sample data
+                document.getElementById('courseName').value = "CMSC 207";
+                document.getElementById('targetGrade').value = "70.0";
+                document.getElementById('finalExamWeight').value = "25.0";
+                
+                // Clear existing categories
+                const categoryContainer = document.getElementById('categoryContainer');
+                categoryContainer.innerHTML = '';
+                
+                // Add sample categories
+                const categories = [
+                    {name: "Midterm Exams", weight: 30, grade: 70},
+                    {name: "Homework", weight: 25, grade: 90},
+                    {name: "Quizzes", weight: 10, grade: 80},
+                    {name: "Participation", weight: 10, grade: 95}
+                ];
+                
+                categories.forEach(category => {
+                    addCategoryRow(category.name, category.weight, category.grade);
+                });
+            }
         });
         
         // Add category row functionality
