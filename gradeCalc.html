@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.9/mammoth.browser.min.js"></script>
+
     <title>Finals Buddy - Grade Calculator</title>
     <style>
     :root {
@@ -127,13 +130,15 @@
 
     input[type="text"],
     input[type="number"],
-    select {
+    select,
+    textarea { /* Added textarea */
         width: 100%;
         padding: 0.75rem;
         border: 1px solid #ddd;
         border-radius: 4px;
         font-size: 1rem;
         background-color: white;
+        font-family: inherit; /* Ensure textarea uses body font */
     }
 
     button,
@@ -158,6 +163,7 @@
     .btn-block {
         display: block;
         width: 100%;
+        margin-top: 1rem; /* Added margin for buttons */
     }
 
     .result,
@@ -188,17 +194,24 @@
     }
 
     .exceptions,
-    .demo-notice {
+    .demo-notice,
+    .processing-notice { /* Added processing notice */
         background-color: #fef2f2;
-        border-left: 4px solid var(--danger);
+        border-left: 4px solid var(--secondary);
         padding: 1rem;
-        margin-top: 2rem;
+        margin-top: 1rem; /* Adjusted margin */
         border-radius: 4px;
     }
+    .processing-notice {
+        background-color: #f0f9ff; /* Lighter blue */
+        border-left-color: var(--secondary);
+        display: none; /* Hide initially */
+    }
+
 
     .exceptions h3 {
         margin-top: 0;
-        color: var(--danger);
+        color: var(--secondary);
     }
 
     .exceptions ul {
@@ -207,7 +220,7 @@
     }
 
     .error {
-        color: var(--danger);
+        color: var(--secondary);
         background-color: #fef2f2;
         padding: 1rem;
         border-radius: 4px;
@@ -238,8 +251,14 @@
         background-color: #f9fafb;
         margin-bottom: 1.5rem;
         position: relative;
-        transition: border-color 0.3s;
+        transition: border-color 0.3s, background-color 0.3s;
+        cursor: pointer; /* Make it look clickable */
     }
+    .upload-container:hover {
+         border-color: var(--secondary);
+         background-color: #f0f9ff;
+    }
+
 
     .upload-icon {
         display: block;
@@ -247,12 +266,19 @@
         width: 60px;
         height: 60px;
         color: #9ca3af;
+        pointer-events: none; /* Let clicks pass through to container */
     }
 
     .upload-text {
         margin-bottom: 1rem;
         color: #6b7280;
+        pointer-events: none; /* Let clicks pass through to container */
     }
+    /* Hide the actual file input */
+    #syllabusFile {
+        display: none;
+    }
+
 
     .or-divider {
         display: flex;
@@ -281,16 +307,20 @@
     .category-header,
     .category-row {
         display: flex;
-        justify-content: space-between;
+        /* justify-content: space-between; */ /* Adjusted for delete button */
+        align-items: center; /* Vertically align items */
         padding: 0.75rem;
         background-color: #f1f5f9;
         border-radius: 4px;
         margin-bottom: 1rem;
         font-weight: 600;
+        gap: 1rem; /* Add gap between flex items */
     }
 
     .category-row {
         border-bottom: 1px solid #ddd;
+        background-color: white; /* Rows background */
+        font-weight: normal; /* Normal weight for input rows */
     }
 
     .category-row:last-child {
@@ -298,13 +328,20 @@
     }
 
     .category-name {
-        flex-basis: 40%;
+        flex-basis: 45%; /* Adjusted width */
     }
 
     .category-weight,
     .current-grade {
         flex-basis: 20%;
         text-align: center;
+    }
+    /* Added style for delete button container */
+    .delete-container {
+        flex-basis: 10%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 
     .add-category {
@@ -334,19 +371,27 @@
     }
 
     .delete-category {
-        margin-left: 10px;
-        color: var(--danger);
+        /* margin-left: 10px; Removed margin, using flex gap */
+        color: var(--secondary);
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
+        padding: 0.25rem; /* Add some padding for easier clicking */
+        border-radius: 50%; /* Make it round */
+        transition: background-color 0.2s;
     }
+     .delete-category:hover {
+        background-color: #fef2f2; /* Light red background on hover */
+     }
+
 
     footer {
         background-color: var(--dark);
         color: white;
         padding: 1.5rem;
         text-align: center;
+        margin-top: auto; /* Push footer down */
     }
 
     .footer-links {
@@ -380,7 +425,14 @@
 
         .category-header, .category-row {
             font-size: 0.9rem;
+            flex-wrap: wrap; /* Allow wrapping on small screens */
+            gap: 0.5rem;
         }
+        .category-name { flex-basis: 100%; order: 1;} /* Full width */
+        .category-weight { flex-basis: 45%; order: 2;}
+        .current-grade { flex-basis: 45%; order: 3;}
+        .delete-container { flex-basis: 100%; order: 4; justify-content: flex-end;}
+
 
         .checkbox-group {
             flex-direction: column;
@@ -398,224 +450,440 @@
             <a href="finalExamFinder.html">Exam Schedule</a>
             <a href="gradeCalc.html">Grade Calculator</a>
             <a href="pomodoroTimer.html">Pomodoro Timer</a>
-            <a href="studyResources.html">Study Resources</a>
         </div>
     </header>
 
-    
+
     <div class="container">
         <h1 class="page-title">Grade Calculator</h1>
-        
+
         <div class="card">
-            <h3>Upload Your Syllabus (Demo Feature)</h3>
-            
-            <div class="demo-notice">
-                <strong>Note:</strong> The syllabus upload feature is currently a demonstration. In this demo version, clicking the "Try Demo" button will populate the form with sample data for demonstration purposes.
+            <h3>Option 1: Upload Your Syllabus</h3>
+            <div class="processing-notice" id="processingNotice">
+                <strong>Note:</strong> File processing happens in your browser for this demo. For the full version, this would involve sending the file to a secure server for analysis using Google Cloud Vision API. No data leaves your computer in this demo.
             </div>
-            
-            <div class="upload-container">
+            <div class="demo-notice">
+                <strong>Note:</strong> This demo uses client-side libraries (PDF.js, Mammoth.js) to extract text from PDF/DOCX files *in your browser*. Actual Cloud Vision API integration requires a backend server to securely handle your API key and process the file. Clicking "Try Demo Data" still populates with sample data.
+            </div>
+
+             <div class="upload-container" id="uploadArea">
+                 <input type="file" id="syllabusFile" accept=".pdf,.docx" aria-label="Upload syllabus file">
                 <svg class="upload-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                     <polyline points="17 8 12 3 7 8"></polyline>
                     <line x1="12" y1="3" x2="12" y2="15"></line>
                 </svg>
-                <p class="upload-text">Syllabus upload feature coming soon!</p>
-                <button id="demoButton" class="btn">Try Demo</button>
+                <p class="upload-text">Click here to upload Syllabus (PDF or DOCX)</p>
+                <span id="fileName" style="font-style: italic; color: #555;"></span> </div>
+             <button id="demoButton" class="btn btn-block" style="margin-top: 1rem; background-color: var(--secondary);">Try the Demo!</button>
+             <div id="uploadError" class="error"></div> </div>
+
+        <div class="card">
+            <h3>Option 2: Paste Syllabus Grading Criteria</h3>
+            <div class="form-group">
+                <label for="syllabusText">Paste the grading breakdown section from your syllabus here:</label>
+                <textarea id="syllabusText" rows="10" placeholder="Example:
+Course Grading:
+- Midterm Exams: 30%
+- Homework Assignments: 25% (lowest dropped)
+- Quizzes: 10%
+- Participation: 10%
+- Final Exam: 25%"></textarea>
             </div>
-        </div>
-        
+            <button id="parseTextButton" class="btn btn-block">Parse Text & Populate Calculator</button>
+            <div id="parseError" class="error"></div> </div>
+
+
         <div class="card">
             <h3>Calculate Your Final Exam Grade</h3>
-            <p>Enter your current grades and the weight of each category to calculate what you need on the final exam.</p>
-            
+            <p>Enter your current grades and the weight of each category (or populate from above) to calculate what you need on the final exam.</p>
+
             <div class="form-group">
-                <label for="courseName">Course Name</label>
+                <label for="courseName">Course Name (Optional)</label>
                 <input type="text" id="courseName" placeholder="e.g., Introduction to Psychology">
             </div>
-            
+
             <div class="form-group">
-                <label for="targetGrade">Target Overall Grade</label>
-                <input type="number" id="targetGrade" min="0" max="100" step="0.1" placeholder="e.g., 90.0">
+                <label for="targetGrade">Target Overall Grade (%)</label>
+                <input type="number" id="targetGrade" min="0" max="100" step="0.1" placeholder="e.g., 90.0" required>
             </div>
-            
+
             <div class="form-group">
                 <label for="finalExamWeight">Final Exam Weight (%)</label>
-                <input type="number" id="finalExamWeight" min="0" max="100" step="0.1" placeholder="e.g., 25.0">
+                <input type="number" id="finalExamWeight" min="0" max="100" step="0.1" placeholder="e.g., 25.0" required>
             </div>
-            
+
             <div class="grade-categories">
                 <div class="category-header">
                     <div class="category-name">Category</div>
                     <div class="category-weight">Weight (%)</div>
                     <div class="current-grade">Current Grade (%)</div>
-                </div>
-                
+                    <div class="delete-container"></div> </div>
+
                 <div id="categoryContainer">
-                    <div class="category-row">
-                        <div class="category-name">
-                            <input type="text" placeholder="e.g., Midterm Exams">
-                        </div>
-                        <div class="category-weight">
-                            <input type="number" min="0" max="100" step="0.1" placeholder="25.0">
-                        </div>
-                        <div class="current-grade">
-                            <input type="number" min="0" max="100" step="0.1" placeholder="85.0">
-                        </div>
                     </div>
-                    
-                    <div class="category-row">
-                        <div class="category-name">
-                            <input type="text" placeholder="e.g., Homework">
-                        </div>
-                        <div class="category-weight">
-                            <input type="number" min="0" max="100" step="0.1" placeholder="15.0">
-                        </div>
-                        <div class="current-grade">
-                            <input type="number" min="0" max="100" step="0.1" placeholder="90.0">
-                        </div>
-                    </div>
-                </div>
-                
+
                 <div class="add-category" id="addCategory">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="10"></circle>
                         <line x1="12" y1="8" x2="12" y2="16"></line>
                         <line x1="8" y1="12" x2="16" y2="12"></line>
                     </svg>
-                    Add Another Category
+                    Add Another Category Manually
                 </div>
             </div>
-            
+
             <button class="btn btn-block" id="calculateButton">Calculate Needed Final Exam Grade</button>
-            
-            <div class="result-container" id="resultContainer">
+             <div id="calcError" class="error"></div> <div class="result-container" id="resultContainer">
                 <h3>Final Exam Grade Needed</h3>
-                <div class="result-grade" id="resultGrade">92.5%</div>
-                <p class="result-message" id="resultMessage">You need to score at least a 92.5% on your final exam to achieve your target grade of 90% in the course.</p>
+                <div class="result-grade" id="resultGrade">--%</div>
+                <p class="result-message" id="resultMessage">Enter your details above and click calculate.</p>
             </div>
         </div>
     </div>
-    
+
     <footer>
         <div class="footer-links">
             <a href="homePage.html">Home</a>
             <a href="finalExamFinder.html">Exam Schedule</a>
             <a href="gradeCalc.html">Grade Calculator</a>
             <a href="pomodoroTimer.html">Pomodoro Timer</a>
-            <a href="studyResources.html">Study Resources</a>
         </div>
         <div class="copyright">© 2025 Finals Buddy. Created by students, for students.</div>
     </footer>
 
     <script>
-        // Demo button functionality
+        // --- DOM Element References ---
         const demoButton = document.getElementById('demoButton');
-        
-        demoButton.addEventListener('click', () => {
-            var min = Math.ceil(1);
-            var max = Math.floor(4);
-            var randomNum = Math.floor(Math.random() * (max - min + 1)) + min;
-            if (randomNum == 1) {
-                // Populate form with sample data
-                document.getElementById('courseName').value = "Introduction to Psychology";
-                document.getElementById('targetGrade').value = "90.0";
-                document.getElementById('finalExamWeight').value = "25.0";
-                
-                // Clear existing categories
-                const categoryContainer = document.getElementById('categoryContainer');
-                categoryContainer.innerHTML = '';
-                
-                // Add sample categories
-                const categories = [
-                    {name: "Midterm Exams", weight: 30, grade: 88},
-                    {name: "Homework", weight: 25, grade: 92},
-                    {name: "Quizzes", weight: 10, grade: 85},
-                    {name: "Participation", weight: 10, grade: 95}
-                ];
-                
-                categories.forEach(category => {
-                    addCategoryRow(category.name, category.weight, category.grade);
-                });
-            }
-            if (randomNum == 2) {
-                // Populate form with sample data
-                document.getElementById('courseName').value = "CMSC 207";
-                document.getElementById('targetGrade').value = "70.0";
-                document.getElementById('finalExamWeight').value = "25.0";
-                
-                // Clear existing categories
-                const categoryContainer = document.getElementById('categoryContainer');
-                categoryContainer.innerHTML = '';
-                
-                // Add sample categories
-                const categories = [
-                    {name: "Midterm Exams", weight: 30, grade: 70},
-                    {name: "Homework", weight: 25, grade: 90},
-                    {name: "Quizzes", weight: 10, grade: 80},
-                    {name: "Participation", weight: 10, grade: 95}
-                ];
-                
-                categories.forEach(category => {
-                    addCategoryRow(category.name, category.weight, category.grade);
-                });
+        const addCategoryButton = document.getElementById('addCategory');
+        const calculateButton = document.getElementById('calculateButton');
+        const categoryContainer = document.getElementById('categoryContainer');
+        const resultContainer = document.getElementById('resultContainer');
+        const resultGradeEl = document.getElementById('resultGrade');
+        const resultMessageEl = document.getElementById('resultMessage');
+        const courseNameInput = document.getElementById('courseName');
+        const targetGradeInput = document.getElementById('targetGrade');
+        const finalExamWeightInput = document.getElementById('finalExamWeight');
+
+        const uploadArea = document.getElementById('uploadArea');
+        const syllabusFileInput = document.getElementById('syllabusFile');
+        const fileNameSpan = document.getElementById('fileName');
+        const processingNotice = document.getElementById('processingNotice');
+        const uploadErrorDiv = document.getElementById('uploadError');
+
+
+        const syllabusTextInput = document.getElementById('syllabusText');
+        const parseTextButton = document.getElementById('parseTextButton');
+        const parseErrorDiv = document.getElementById('parseError');
+        const calcErrorDiv = document.getElementById('calcError');
+
+        // --- Helper Functions ---
+        function displayError(element, message) {
+            element.textContent = message;
+            element.style.display = 'block';
+        }
+
+        function clearError(element) {
+            element.textContent = '';
+            element.style.display = 'none';
+        }
+
+        function clearCalculatorInputs(clearCourse = false) {
+             if(clearCourse) courseNameInput.value = '';
+             // targetGradeInput.value = ''; // Keep target grade
+             finalExamWeightInput.value = '';
+             categoryContainer.innerHTML = ''; // Clear existing categories
+             resultContainer.style.display = 'none'; // Hide previous result
+             clearError(calcErrorDiv);
+             clearError(parseErrorDiv);
+             clearError(uploadErrorDiv);
+        }
+
+
+        // --- Syllabus Parsing Logic (Client-Side Demo) ---
+        // Basic regex - adjust these based on common syllabus patterns
+        const courseNameRegex = /(?:Course Name|Course:|Subject:)\s*([^\n\r]+)/i;
+        const finalExamRegex = /(?:Final Exam|Final Assessment|Final Project)\s*:?\s*(\d{1,3}(?:\.\d{1,2})?)\s*%/i;
+        // Regex to find lines like "Category Name: XX%" or "Category Name XX%"
+        const categoryRegex = /^\s*[-*]?\s*([^:\n\r(%]+?)\s*:?\s*(\d{1,3}(?:\.\d{1,2})?)\s*%/gim; // global, multiline, case-insensitive
+
+        function parseSyllabusText(text) {
+            console.log("Parsing text:\n", text); // Log input text
+            const parsedData = {
+                courseName: '',
+                finalExamWeight: null,
+                categories: []
+            };
+            let totalWeight = 0;
+
+            // Extract Course Name (optional)
+            const courseMatch = text.match(courseNameRegex);
+            if (courseMatch && courseMatch[1]) {
+                parsedData.courseName = courseMatch[1].trim();
+                console.log("Found Course Name:", parsedData.courseName);
             }
 
-            if (randomNum == 3) {
-                // Populate form with sample data
-                document.getElementById('courseName').value = "CMSC 204";
-                document.getElementById('targetGrade').value = "70.0";
-                document.getElementById('finalExamWeight').value = "90.0";
-                
-                // Clear existing categories
-                const categoryContainer = document.getElementById('categoryContainer');
-                categoryContainer.innerHTML = '';
-                
-                // Add sample categories
-                const categories = [
-                    {name: "Participation", weight: 10, grade: 10}
-                ];
-                
-                categories.forEach(category => {
-                    addCategoryRow(category.name, category.weight, category.grade);
-                });
+            // Extract Final Exam Weight
+            const finalExamMatch = text.match(finalExamRegex);
+            if (finalExamMatch && finalExamMatch[1]) {
+                parsedData.finalExamWeight = parseFloat(finalExamMatch[1]);
+                console.log("Found Final Exam Weight:", parsedData.finalExamWeight);
             }
 
-            if (randomNum == 4) {
-                // Populate form with sample data
-                document.getElementById('courseName').value = "PYS 161";
-                document.getElementById('targetGrade').value = "90.0";
-                document.getElementById('finalExamWeight').value = "10.0";
-                
-                // Clear existing categories
-                const categoryContainer = document.getElementById('categoryContainer');
-                categoryContainer.innerHTML = '';
-                
-                // Add sample categories
-                const categories = [
-                    {name: "Midterm Exams", weight: 70, grade: 80},
-                    {name: "Homework", weight: 10, grade: 90},
-                    {name: "Quizzes", weight: 10, grade: 80},
-                ];
-                
-                categories.forEach(category => {
-                    addCategoryRow(category.name, category.weight, category.grade);
-                });
+            // Extract Other Categories
+            let match;
+            while ((match = categoryRegex.exec(text)) !== null) {
+                const name = match[1].trim();
+                const weight = parseFloat(match[2]);
+
+                // Avoid matching the final exam again if it was already found
+                 if (name.toLowerCase().includes('final exam') && parsedData.finalExamWeight !== null) {
+                     console.log("Skipping category match, looks like Final Exam:", name);
+                    continue;
+                }
+                 // Basic check to avoid overly broad matches (e.g., just numbers)
+                 if (name.length < 3 || !isNaN(name)) {
+                    console.log("Skipping potential invalid category name:", name);
+                    continue;
+                 }
+
+
+                if (!isNaN(weight)) {
+                    console.log(`Found Category: ${name}, Weight: ${weight}`);
+                    parsedData.categories.push({ name, weight });
+                    totalWeight += weight;
+                }
+            }
+
+            // If final exam weight wasn't found explicitly, try to find it in categories
+            if (parsedData.finalExamWeight === null) {
+                const finalExamIndex = parsedData.categories.findIndex(cat => cat.name.toLowerCase().includes('final exam'));
+                if (finalExamIndex > -1) {
+                    parsedData.finalExamWeight = parsedData.categories[finalExamIndex].weight;
+                    // Remove it from the regular categories list
+                    parsedData.categories.splice(finalExamIndex, 1);
+                    console.log("Found Final Exam Weight in categories:", parsedData.finalExamWeight);
+                }
+            }
+
+
+            console.log("Parsing complete:", parsedData);
+            // Basic validation
+             if (parsedData.categories.length === 0 && parsedData.finalExamWeight === null) {
+                 throw new Error("Could not automatically detect grading categories or final exam weight. Please check the text or enter manually.");
+            }
+            if (parsedData.finalExamWeight === null) {
+                 throw new Error("Could not automatically detect the final exam weight. Please enter it manually.");
+            }
+
+            return parsedData;
+        }
+
+
+        // --- Populate Calculator ---
+        function populateCalculator(parsedData) {
+            clearCalculatorInputs(true); // Clear everything including course name
+
+             if (parsedData.courseName) {
+                 courseNameInput.value = parsedData.courseName;
+             }
+             if (parsedData.finalExamWeight !== null) {
+                 finalExamWeightInput.value = parsedData.finalExamWeight.toFixed(1);
+             }
+
+             parsedData.categories.forEach(category => {
+                 addCategoryRow(category.name, category.weight.toFixed(1), ''); // Leave current grade blank
+             });
+             console.log("Populated calculator fields.");
+         }
+
+
+        // --- File Upload Handling ---
+        uploadArea.addEventListener('click', () => {
+            syllabusFileInput.click(); // Trigger the hidden file input
+        });
+
+        syllabusFileInput.addEventListener('change', async (event) => {
+            clearError(uploadErrorDiv);
+            processingNotice.style.display = 'none'; // Hide notice initially
+            fileNameSpan.textContent = ''; // Clear previous file name
+
+            const file = event.target.files[0];
+            if (!file) {
+                return; // No file selected
+            }
+
+            fileNameSpan.textContent = `Selected: ${file.name}`;
+            processingNotice.style.display = 'block'; // Show processing notice
+
+            console.log(`File selected: ${file.name}, Type: ${file.type}`);
+
+             // **CONCEPTUAL GOOGLE CLOUD VISION API INTEGRATION POINT**
+             // In a real application:
+             // 1. Create FormData: `const formData = new FormData(); formData.append('syllabus', file);`
+             // 2. Send to Backend: `Workspace('/api/process-syllabus', { method: 'POST', body: formData, headers: { /* Auth headers if needed */ } })`
+             // 3. Backend Uses Cloud Vision API:
+             //    - Receives the file.
+             //    - Authenticates using your API key (securely stored on the server, **NEVER in frontend JS**).
+             //    - Uses Google Cloud Client Libraries (Node.js, Python, etc.) to call Cloud Vision Document Text Detection (for PDF) or appropriate libraries for DOCX.
+             //    - Parses the Cloud Vision JSON response to extract text.
+             //    - Runs server-side parsing logic (more robust than client-side regex) on the extracted text.
+             //    - Returns structured JSON data (like `parsedData` object) to the frontend.
+             // 4. Frontend Receives Response: `.then(response => response.json()).then(data => { populateCalculator(data); })`
+             //    `.catch(error => { displayError(uploadErrorDiv, 'Error processing file on server.'); });`
+             // **END CONCEPTUAL SECTION**
+
+
+             // --- DEMO: Client-side text extraction and parsing ---
+             try {
+                 let text = '';
+                 if (file.type === 'application/pdf') {
+                     console.log("Attempting PDF text extraction...");
+                     // Set worker source for PDF.js
+                     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
+
+                     const reader = new FileReader();
+                     text = await new Promise((resolve, reject) => {
+                         reader.onload = async (e) => {
+                             try {
+                                 const loadingTask = pdfjsLib.getDocument({ data: e.target.result });
+                                 const pdf = await loadingTask.promise;
+                                 console.log('PDF loaded');
+                                 let fullText = '';
+                                 for (let i = 1; i <= pdf.numPages; i++) {
+                                     const page = await pdf.getPage(i);
+                                     const textContent = await page.getTextContent();
+                                     textContent.items.forEach(item => {
+                                         fullText += item.str + ' '; // Add space between items
+                                     });
+                                     fullText += '\n'; // New line for each page
+                                 }
+                                 console.log("PDF text extracted.");
+                                 resolve(fullText);
+                             } catch (pdfError) {
+                                 console.error('Error during PDF processing:', pdfError);
+                                 reject('Failed to extract text from PDF.');
+                             }
+                         };
+                         reader.onerror = (e) => {
+                             console.error("FileReader error:", e);
+                             reject('Failed to read PDF file.');
+                         }
+                         reader.readAsArrayBuffer(file);
+                     });
+
+                 } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+                     console.log("Attempting DOCX text extraction...");
+                     const reader = new FileReader();
+                     text = await new Promise((resolve, reject) => {
+                         reader.onload = async (e) => {
+                             try {
+                                 const result = await mammoth.extractRawText({ arrayBuffer: e.target.result });
+                                 console.log("DOCX text extracted.");
+                                 resolve(result.value);
+                             } catch (docxError) {
+                                 console.error('Error during DOCX processing:', docxError);
+                                 reject('Failed to extract text from DOCX.');
+                             }
+                         };
+                         reader.onerror = (e) => {
+                              console.error("FileReader error:", e);
+                              reject('Failed to read DOCX file.');
+                         }
+                         reader.readAsArrayBuffer(file);
+                     });
+                 } else {
+                     throw new Error('Unsupported file type. Please upload PDF or DOCX.');
+                 }
+
+                 // Once text is extracted (simulated backend response)
+                 const parsedData = parseSyllabusText(text);
+                 populateCalculator(parsedData);
+                 // Optionally, scroll to the calculator
+                 document.getElementById('courseName').scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+             } catch (error) {
+                 console.error("Client-side processing error:", error);
+                 displayError(uploadErrorDiv, `Error processing file: ${error.message || error}`);
+             } finally {
+                 processingNotice.style.display = 'none'; // Hide notice after processing
+                 syllabusFileInput.value = ''; // Reset file input to allow re-uploading the same file
+             }
+        });
+
+        // --- Text Area Parsing ---
+        parseTextButton.addEventListener('click', () => {
+            clearError(parseErrorDiv);
+            const text = syllabusTextInput.value;
+
+            if (!text.trim()) {
+                displayError(parseErrorDiv, "Please paste syllabus text into the box first.");
+                return;
+            }
+
+            try {
+                const parsedData = parseSyllabusText(text);
+                populateCalculator(parsedData);
+                 // Optionally, scroll to the calculator
+                 document.getElementById('courseName').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } catch (error) {
+                console.error("Text parsing error:", error);
+                displayError(parseErrorDiv, `Error parsing text: ${error.message || error}`);
             }
         });
-        
-        // Add category row functionality
-        const addCategoryButton = document.getElementById('addCategory');
-        
+
+
+        // --- Demo Button Functionality ---
+        demoButton.addEventListener('click', () => {
+             clearError(uploadErrorDiv);
+             clearError(parseErrorDiv);
+             clearError(calcErrorDiv);
+             fileNameSpan.textContent = ''; // Clear file name if demo is clicked
+
+            const demos = [
+                {
+                    courseName: "Introduction to Psychology", targetGrade: "90.0", finalExamWeight: "25.0",
+                    categories: [ {name: "Midterm Exams", weight: 30, grade: 88}, {name: "Homework", weight: 25, grade: 92}, {name: "Quizzes", weight: 10, grade: 85}, {name: "Participation", weight: 10, grade: 95} ]
+                },
+                {
+                    courseName: "CMSC 207", targetGrade: "70.0", finalExamWeight: "25.0",
+                    categories: [ {name: "Midterm Exams", weight: 30, grade: 70}, {name: "Homework", weight: 25, grade: 90}, {name: "Quizzes", weight: 10, grade: 80}, {name: "Participation", weight: 10, grade: 95} ]
+                },
+                 {
+                    courseName: "CMSC 204", targetGrade: "70.0", finalExamWeight: "30.0", // Adjusted final weight
+                    categories: [ {name: "Projects", weight: 40, grade: 75}, {name: "Labs", weight: 20, grade: 80}, {name: "Participation", weight: 10, grade: 100} ] // Added more realistic categories
+                },
+                 {
+                    courseName: "PHYS 161", targetGrade: "90.0", finalExamWeight: "20.0", // Adjusted final weight
+                    categories: [ {name: "Midterm Exams", weight: 50, grade: 80}, {name: "Lab Reports", weight: 20, grade: 90}, {name: "Homework", weight: 10, grade: 95} ] // Adjusted categories
+                }
+            ];
+
+             const randomDemo = demos[Math.floor(Math.random() * demos.length)];
+
+             // Populate form with sample data
+             clearCalculatorInputs(true); // Clear previous inputs/categories first
+             courseNameInput.value = randomDemo.courseName;
+             targetGradeInput.value = randomDemo.targetGrade;
+             finalExamWeightInput.value = randomDemo.finalExamWeight;
+
+             randomDemo.categories.forEach(category => {
+                 // Use the demo grade for population here
+                 addCategoryRow(category.name, category.weight, category.grade);
+             });
+             console.log("Populated with Demo Data:", randomDemo);
+         });
+
+
+        // --- Add Category Row Functionality ---
         addCategoryButton.addEventListener('click', () => {
             addCategoryRow('', '', '');
         });
-        
+
         function addCategoryRow(name = '', weight = '', grade = '') {
-            const categoryContainer = document.getElementById('categoryContainer');
-            
             const newRow = document.createElement('div');
             newRow.className = 'category-row';
-            
+
             // Create category name input
             const nameDiv = document.createElement('div');
             nameDiv.className = 'category-name';
@@ -624,7 +892,7 @@
             nameInput.placeholder = 'e.g., Quizzes';
             nameInput.value = name;
             nameDiv.appendChild(nameInput);
-            
+
             // Create weight input
             const weightDiv = document.createElement('div');
             weightDiv.className = 'category-weight';
@@ -633,10 +901,11 @@
             weightInput.min = '0';
             weightInput.max = '100';
             weightInput.step = '0.1';
-            weightInput.placeholder = '10.0';
+            weightInput.placeholder = 'e.g., 10.0';
             weightInput.value = weight;
+            weightInput.setAttribute('aria-label', 'Category Weight Percentage'); // Accessibility
             weightDiv.appendChild(weightInput);
-            
+
             // Create grade input
             const gradeDiv = document.createElement('div');
             gradeDiv.className = 'current-grade';
@@ -645,70 +914,167 @@
             gradeInput.min = '0';
             gradeInput.max = '100';
             gradeInput.step = '0.1';
-            gradeInput.placeholder = '85.0';
+            gradeInput.placeholder = 'e.g., 85.0';
             gradeInput.value = grade;
+            gradeInput.setAttribute('aria-label', 'Current Grade Percentage'); // Accessibility
             gradeDiv.appendChild(gradeInput);
-            
-            // Add delete button
+
+            // Add delete button container
+            const deleteContainer = document.createElement('div');
+            deleteContainer.className = 'delete-container';
             const deleteButton = document.createElement('div');
             deleteButton.className = 'delete-category';
+            deleteButton.title = 'Remove Category'; // Tooltip
             deleteButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
+            deleteButton.setAttribute('role', 'button'); // Accessibility
+            deleteButton.setAttribute('tabindex', '0'); // Make focusable
             deleteButton.addEventListener('click', function() {
                 categoryContainer.removeChild(newRow);
+                resultContainer.style.display = 'none'; // Hide result if categories change
             });
-            
+             // Allow deleting with Enter/Space key when focused
+            deleteButton.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    categoryContainer.removeChild(newRow);
+                    resultContainer.style.display = 'none';
+                    event.preventDefault(); // Prevent default space bar scrolling
+                }
+            });
+            deleteContainer.appendChild(deleteButton);
+
+
             // Append all elements to the row
             newRow.appendChild(nameDiv);
             newRow.appendChild(weightDiv);
             newRow.appendChild(gradeDiv);
-            newRow.appendChild(deleteButton);
-            
+            newRow.appendChild(deleteContainer); // Append delete button container
+
             // Add the new row to the container
             categoryContainer.appendChild(newRow);
         }
-        
-        // Calculate button functionality
-        const calculateButton = document.getElementById('calculateButton');
-        
+
+
+        // --- Calculate Button Functionality ---
         calculateButton.addEventListener('click', () => {
+            clearError(calcErrorDiv); // Clear previous errors
+            resultContainer.style.display = 'none'; // Hide previous result
+
             // Get input values
-            const targetGrade = parseFloat(document.getElementById('targetGrade').value);
-            const finalExamWeight = parseFloat(document.getElementById('finalExamWeight').value);
-            const courseName = document.getElementById('courseName').value || 'this course';
-            
+            const targetGrade = parseFloat(targetGradeInput.value);
+            const finalExamWeight = parseFloat(finalExamWeightInput.value);
+            const courseName = courseNameInput.value.trim() || 'this course';
+
+             // Basic Input Validation
+            if (isNaN(targetGrade) || targetGrade < 0 || targetGrade > 100) {
+                 displayError(calcErrorDiv, "Please enter a valid Target Overall Grade (0-100).");
+                 targetGradeInput.focus();
+                 return;
+            }
+             if (isNaN(finalExamWeight) || finalExamWeight <= 0 || finalExamWeight > 100) {
+                 displayError(calcErrorDiv, "Please enter a valid Final Exam Weight (greater than 0, up to 100).");
+                 finalExamWeightInput.focus();
+                 return;
+            }
+
+
             // Get all category rows
-            const categoryRows = document.querySelectorAll('.category-row');
+            const categoryRows = categoryContainer.querySelectorAll('.category-row');
             let totalWeight = 0;
-            let weightedGrade = 0;
-            
-            // Calculate current weighted grade
-            categoryRows.forEach(row => {
-                const categoryWeight = parseFloat(row.querySelector('.category-weight input').value);
-                const categoryGrade = parseFloat(row.querySelector('.current-grade input').value);
-                
-                if (!isNaN(categoryWeight) && !isNaN(categoryGrade)) {
-                    totalWeight += categoryWeight;
-                    weightedGrade += (categoryGrade * (categoryWeight / 100));
-                }
+            let currentWeightedScore = 0;
+            let invalidCategory = false;
+
+            // Calculate current weighted grade and total weight from categories
+            categoryRows.forEach((row, index) => {
+                const categoryWeightInput = row.querySelector('.category-weight input');
+                const categoryGradeInput = row.querySelector('.current-grade input');
+
+                const categoryWeight = parseFloat(categoryWeightInput.value);
+                const categoryGrade = parseFloat(categoryGradeInput.value);
+
+                // Validate each category row
+                 if (isNaN(categoryWeight) || categoryWeight < 0 || categoryWeight > 100) {
+                     displayError(calcErrorDiv, `Invalid weight in category #${index + 1}. Please enter a number between 0 and 100.`);
+                     categoryWeightInput.focus();
+                     invalidCategory = true;
+                     return; // Stop processing this row
+                 }
+                if (isNaN(categoryGrade) || categoryGrade < 0 || categoryGrade > 100) {
+                     displayError(calcErrorDiv, `Invalid current grade in category #${index + 1}. Please enter a number between 0 and 100.`);
+                     categoryGradeInput.focus();
+                     invalidCategory = true;
+                     return; // Stop processing this row
+                 }
+
+                totalWeight += categoryWeight;
+                currentWeightedScore += (categoryGrade * (categoryWeight / 100));
             });
-            
-            // Calculate required final exam grade
-            const remainingWeight = 100 - totalWeight;
-            
-            if (remainingWeight !== finalExamWeight) {
-                alert("Warning: The sum of all category weights plus the final exam weight should equal 100%. Please check your weights.");
+
+            // Stop calculation if any category was invalid
+            if (invalidCategory) {
                 return;
             }
-            
-            const requiredFinalScore = ((targetGrade - weightedGrade) / (finalExamWeight / 100)).toFixed(1);
-            
-            // Display result
-            document.getElementById('resultGrade').textContent = requiredFinalScore + "%";
-            document.getElementById('resultMessage').textContent = 
-                `You need to score at least ${requiredFinalScore}% on your final exam to achieve your target grade of ${targetGrade}% in ${courseName}.`;
-            
-            document.getElementById('resultContainer').style.display = 'block';
+
+            // Validate total weights
+            const combinedWeight = totalWeight + finalExamWeight;
+            if (Math.abs(combinedWeight - 100) > 0.1) { // Allow for small floating point inaccuracies
+                displayError(calcErrorDiv, `The sum of all category weights (${totalWeight.toFixed(1)}%) plus the final exam weight (${finalExamWeight.toFixed(1)}%) should equal 100%. Current total: ${combinedWeight.toFixed(1)}%.`);
+                 return;
+             }
+             if (totalWeight >= 100) {
+                 displayError(calcErrorDiv, `The sum of category weights (${totalWeight.toFixed(1)}%) is already 100% or more. The final exam weight must be greater than 0.`);
+                 return;
+             }
+
+
+            // Calculate required final exam grade
+            // Formula: target = current_weighted_score + final_score * (final_weight / 100)
+            // Rearranged: final_score = (target - current_weighted_score) / (final_weight / 100)
+            const neededWeightedScoreForFinal = targetGrade - currentWeightedScore;
+
+            // Check if target is achievable based on current score
+            if (neededWeightedScoreForFinal < 0 && finalExamWeight > 0) {
+                 // This means the user has already achieved or exceeded the target grade before the final
+                 resultGradeEl.textContent = "0.0%";
+                 resultMessageEl.textContent = `Congratulations! You've already achieved your target grade of ${targetGrade}% in ${courseName}, even with a 0% on the final.`;
+                 resultContainer.style.display = 'block';
+                 resultContainer.style.backgroundColor = 'var(--accent)'; // Green background for success
+                 resultContainer.style.color = 'var(--light)';
+                 return;
+             }
+
+
+            const requiredFinalScore = (neededWeightedScoreForFinal / (finalExamWeight / 100));
+
+             // Display result
+            resultGradeEl.textContent = requiredFinalScore.toFixed(1) + "%";
+
+            let message = `You need to score at least ${requiredFinalScore.toFixed(1)}% on your final exam to achieve your target grade of ${targetGrade}% in ${courseName}.`;
+
+             // Add messages for impossible scenarios
+             if (requiredFinalScore > 100) {
+                 message += `\nWarning: This score is higher than 100%, which might be impossible depending on the exam's grading scale.`;
+                 resultContainer.style.backgroundColor = 'var(--accent)'; // Yellow background
+                 resultContainer.style.color = 'var(--dark)';
+            } else if (requiredFinalScore < 0) {
+                 // Should be caught by the check above, but as a fallback
+                  message = `You've already passed your target grade! You technically need ${requiredFinalScore.toFixed(1)}% (effectively 0%) on the final for a ${targetGrade}% overall.`;
+                  resultContainer.style.backgroundColor = 'var(--accent)'; // Green background
+                  resultContainer.style.color = 'var(--light)';
+             } else {
+                 // Reset to default style if previously changed
+                 resultContainer.style.backgroundColor = 'var(--accent)';
+                 resultContainer.style.color = 'var(--primary)'; // Or default text color
+             }
+
+             resultMessageEl.textContent = message;
+             resultContainer.style.display = 'block';
+             resultContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
         });
+
+        // Initialize: Add one empty row on page load? (Optional)
+        // addCategoryRow();
+
     </script>
 </body>
 </html>
