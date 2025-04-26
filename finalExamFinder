@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spring 2025 Final Exam Schedule Finder</title>
+    <style>
+    :root {
+        /* Choose your preferred primary, secondary, etc. */
+        --primary: #4f46e5; /* from second sheet, previously #1e3a8a */
+        --primary-dark: #3730a3;
+        --secondary: #6366f1; /* from second sheet, previously #3b82f6 */
+        --accent: #a5b4fc;    /* from second sheet, previously #93c5fd */
+        --light: #f8fafc;
+        --dark: #1e1b4b;      /* from second sheet, previously #0f172a */
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #334155;
+        background-color: var(--light);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    header {
+        background-color: var(--primary);
+        color: white;
+        text-align: center;
+        padding: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .logo {
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    .nav-links {
+        display: flex;
+        gap: 1.5rem;
+    }
+
+    .nav-links a {
+        color: white;
+        text-decoration: none;
+        font-weight: 600;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        transition: background-color 0.2s, opacity 0.2s;
+    }
+
+    .nav-links a:hover {
+        background-color: var(--secondary);
+        opacity: 0.8;
+    }
+
+    .subtitle {
+        font-size: 1.2rem;
+        margin-top: 0.5rem;
+        opacity: 0.9;
+    }
+
+    .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 2rem 1.5rem;
+        flex-grow: 1;
+    }
+
+    .card {
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .card h3 {
+        color: var(--primary);
+        margin-bottom: 1rem;
+        font-size: 1.3rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .checkbox-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem 1.5rem;
+        margin-top: 0.5rem;
+    }
+
+    .checkbox-label {
+        display: flex;
+        align-items: center;
+        font-weight: normal;
+        cursor: pointer;
+    }
+
+    input[type="checkbox"] {
+        margin-right: 0.5rem;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 1rem;
+        background-color: white;
+    }
+
+    button,
+    .btn {
+        background-color: var(--secondary);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        font-weight: 600;
+        text-align: center;
+    }
+
+    button:hover,
+    .btn:hover {
+        background-color: var(--primary);
+    }
+
+    .btn-block {
+        display: block;
+        width: 100%;
+    }
+
+    .result,
+    .result-container {
+        background-color: var(--accent);
+        border-radius: 8px;
+        padding: 1.5rem;
+        text-align: center;
+        display: none; /* Initially hidden */
+        margin-top: 2rem;
+    }
+
+    .result.show {
+        display: block; /* Display when 'show' class is added */
+        animation: fadeIn 0.5s;
+    }
+
+    .exam-date {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .exam-time {
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+
+    .exceptions,
+    .demo-notice {
+        background-color: #fef2f2;
+        border-left: 4px solid var(--danger);
+        padding: 1rem;
+        margin-top: 2rem;
+        border-radius: 4px;
+    }
+
+    .exceptions h3 {
+        margin-top: 0;
+        color: var(--danger);
+    }
+
+    .exceptions ul {
+        margin-bottom: 0;
+        padding-left: 1.5rem;
+    }
+
+    .error {
+        color: var(--danger);
+        background-color: #fef2f2;
+        padding: 1rem;
+        border-radius: 4px;
+        margin-top: 1rem;
+        display: none; /* Initially hidden */
+    }
+
+    .page-title {
+        text-align: center;
+        margin-bottom: 2rem;
+        color: var(--primary);
+    }
+
+    .instruction-steps ol {
+        padding-left: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .instruction-steps li {
+        margin-bottom: 0.5rem;
+    }
+
+    .upload-container {
+        border: 2px dashed #ccc;
+        padding: 2rem;
+        text-align: center;
+        border-radius: 8px;
+        background-color: #f9fafb;
+        margin-bottom: 1.5rem;
+        position: relative;
+        transition: border-color 0.3s;
+    }
+
+    .upload-icon {
+        display: block;
+        margin: 0 auto 1rem;
+        width: 60px;
+        height: 60px;
+        color: #9ca3af;
+    }
+
+    .upload-text {
+        margin-bottom: 1rem;
+        color: #6b7280;
+    }
+
+    .or-divider {
+        display: flex;
+        align-items: center;
+        margin: 1.5rem 0;
+    }
+
+    .or-divider::before,
+    .or-divider::after {
+        content: "";
+        flex-grow: 1;
+        background-color: #ccc;
+        height: 1px;
+    }
+
+    .or-divider span {
+        padding: 0 1rem;
+        color: #777;
+        font-weight: 500;
+    }
+
+    .grade-categories {
+        margin-top: 1.5rem;
+    }
+
+    .category-header,
+    .category-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.75rem;
+        background-color: #f1f5f9;
+        border-radius: 4px;
+        margin-bottom: 1rem;
+        font-weight: 600;
+    }
+
+    .category-row {
+        border-bottom: 1px solid #ddd;
+    }
+
+    .category-row:last-child {
+        border-bottom: none;
+    }
+
+    .category-name {
+        flex-basis: 40%;
+    }
+
+    .category-weight,
+    .current-grade {
+        flex-basis: 20%;
+        text-align: center;
+    }
+
+    .add-category {
+        display: flex;
+        align-items: center;
+        margin-top: 1rem;
+        color: var(--secondary);
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .add-category svg {
+        margin-right: 0.5rem;
+        width: 16px;
+        height: 16px;
+    }
+
+    .result-grade {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--secondary);
+        margin: 1rem 0;
+    }
+
+    .result-message {
+        margin-bottom: 0;
+    }
+
+    footer {
+        background-color: var(--dark);
+        color: white;
+        padding: 1.5rem;
+        text-align: center;
+    }
+
+    .footer-links {
+        margin-bottom: 1rem;
+    }
+
+    .footer-links a {
+        color: var(--accent);
+        text-decoration: none;
+        margin: 0 0.75rem;
+    }
+
+    .footer-links a:hover {
+        text-decoration: underline;
+    }
+
+    .copyright {
+        opacity: 0.75;
+        font-size: 0.9rem;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @media (max-width: 768px) {
+        .card {
+            padding: 1.5rem;
+        }
+
+        .category-header, .category-row {
+            font-size: 0.9rem;
+        }
+
+        .checkbox-group {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+    }
+</style>
+
+</head>
+<body>
+    <header>
+        <div class="logo">Finals Buddy</div>
+        <div class="nav-links">
+            <a href="homePage.html">Home</a>
+            <a href="nima.html">Exam Schedule</a>
+            <a href="gradeCalc.html">Grade Calculator</a>
+            <a href="pomodoroTimer.html">Pomodoro Timer</a>
+        </div>
+    </header>
+    <div class="container">
+        <div class="card">
+            <h2>Find Your Final Exam Time</h2>
+            <p>Select the days your class meets and the start time to find when your final exam will be held.</p>
+
+            <form id="examForm">
+                <div class="form-group">
+                    <label>On which days does your class meet?</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="days" value="Monday"> Monday
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="days" value="Tuesday"> Tuesday
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="days" value="Wednesday"> Wednesday
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="days" value="Thursday"> Thursday
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="days" value="Friday"> Friday
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="startTime">What time does your class start?</label>
+                    <select id="startTime" name="startTime">
+                        <option value="">-- Select Start Time --</option>
+                        <option value="6:00-7:29am">6:00 - 7:29 AM</option>
+                        <option value="7:30-8:54am">7:30 - 8:54 AM</option>
+                        <option value="8:55-9:54am">8:55 - 9:54 AM</option>
+                        <option value="9:55-10:54am">9:55 - 10:54 AM</option>
+                        <option value="10:55-11:54am">10:55 - 11:54 AM</option>
+                        <option value="11:55-12:54pm">11:55 AM - 12:54 PM</option>
+                        <option value="12:55-1:54pm">12:55 - 1:54 PM</option>
+                        <option value="1:55-2:54pm">1:55 - 2:54 PM</option>
+                        <option value="2:55-4:29pm">2:55 - 4:29 PM</option>
+                        <option value="4:30-5:59pm">4:30 - 5:59 PM</option>
+                        <option value="6:00-7:19pm">6:00 - 7:19 PM</option>
+                        <option value="7:20-9:29pm">7:20 - 9:29 PM</option>
+                    </select>
+                </div>
+
+                <button type="button" id="findExam">Find My Exam Time</button>
+            </form>
+
+            <div class="error" id="errorMessage">Please select at least one day and a start time.</div>
+
+            <div class="result" id="examResult">
+                <h3>Your Final Exam is scheduled for:</h3>
+                <div class="exam-date" id="examDate"></div>
+                <div class="exam-time" id="examTime"></div>
+            </div>
+
+            <div class="exceptions">
+                <h3>Important Exceptions</h3>
+                <ul>
+                    <li>If your class is a Part of Term 3 class and ends during final exam week, your exam will be the last day of class.</li>
+                    <li>If your class includes both a lecture and a lab, follow the schedule for the lecture time period.</li>
+                    <li>Saturday and Sunday classes will meet at their regular start time on May 17-18, 2025 for a two-hour exam period.</li>
+                    <li>Special exams for CHEM 131 and CHEM 132 courses - check the full schedule for details.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-links">
+            <a href="homePage.html">Home</a>
+            <a href="nima.html">Exam Schedule</a>
+            <a href="gradeCalc.html">Grade Calculator</a>
+            <a href="pomodoroTimer.html">Pomodoro Timer</a>
+        </div>
+        <div class="copyright">© 2025 Finals Buddy. Created by students, for students.</div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const examForm = document.getElementById('examForm');
+            const findExamButton = document.getElementById('findExam');
+            const examResult = document.getElementById('examResult');
+            const errorMessage = document.getElementById('errorMessage');
+            const examDate = document.getElementById('examDate');
+            const examTime = document.getElementById('examTime');
+
+            findExamButton.addEventListener('click', function() {
+                // Ensure form elements exist before accessing them
+                if (!examForm || !findExamButton || !examResult || !errorMessage || !examDate || !examTime) {
+                    console.error("One or more required HTML elements are missing.");
+                    return;
+                }
+
+                const daysSelected = [...examForm.querySelectorAll('input[name="days"]:checked')].map(input => input.value);
+                const startTimeSelect = examForm.querySelector('select[name="startTime"]');
+                const startTime = startTimeSelect ? startTimeSelect.value : null;
+
+                if (daysSelected.length === 0 || !startTime) {
+                    errorMessage.textContent = 'Please select the day(s) your class meets and the start time.';
+                    errorMessage.style.display = 'block';
+                    examResult.classList.remove('show'); // Hide result if inputs are invalid
+                    return;
+                }
+
+                errorMessage.style.display = 'none';
+                const examSchedule = getExamSchedule(daysSelected, startTime);
+
+                if (examSchedule) {
+                    examDate.textContent = examSchedule.date;
+                    examTime.textContent = examSchedule.time;
+                    examResult.classList.add('show');
+                } else {
+                    // Handle cases where schedule might not be found even with valid input
+                    // (Shouldn't happen with the comprehensive data below, but good practice)
+                    examDate.textContent = "Schedule not found";
+                    examTime.textContent = "Please check inputs or consult schedule/instructor.";
+                    examResult.classList.add('show');
+                }
+            });
+
+            function getExamSchedule(daysSelected, startTime) {
+                // Define exam schedule based on the provided table image
+                // Times corrected to match the image exactly
+                const examScheduleData = {
+                    "6:00-7:29am": {
+                        "Monday,Wednesday,Friday": { date: "May 16", time: "7-9am" },
+                        "Monday,Wednesday": { date: "May 16", time: "7-9am" },
+                        "Tuesday,Thursday": { date: "May 16", time: "7-9am" },
+                        "MondayOnly": { date: "May 16", time: "7-9am" },
+                        "TuesdayOnly": { date: "May 16", time: "7-9am" },
+                        "WednesdayOnly": { date: "May 16", time: "7-9am" },
+                        "ThursdayOnly": { date: "May 16", time: "7-9am" },
+                        "FridayOnly": { date: "May 16", time: "7-9am" },
+                        "Monday": { date: "May 16", time: "7-9am" }, // Fallback
+                        "Tuesday": { date: "May 16", time: "7-9am" }, // Fallback
+                        "Wednesday": { date: "May 16", time: "7-9am" },// Fallback
+                        "Thursday": { date: "May 16", time: "7-9am" },// Fallback
+                        "Friday": { date: "May 16", time: "7-9am" }   // Fallback
+                    },
+                    "7:30-8:54am": {
+                        "Monday,Wednesday,Friday": { date: "May 12", time: "8-10am" },
+                        "Monday,Wednesday": { date: "May 12", time: "8-10am" },
+                        "Tuesday,Thursday": { date: "May 13", time: "8-10am" },
+                        "MondayOnly": { date: "May 12", time: "8-10am" },
+                        "TuesdayOnly": { date: "May 13", time: "8-10am" },
+                        "WednesdayOnly": { date: "May 14", time: "8-10am" },
+                        "ThursdayOnly": { date: "May 15", time: "8-10am" },
+                        "FridayOnly": { date: "May 16", time: "8-10am" },
+                        "Monday": { date: "May 12", time: "8-10am" }, // Fallback matches MWF/MW/M Only
+                        "Tuesday": { date: "May 13", time: "8-10am" }, // Fallback matches TTh/T Only
+                        "Wednesday": { date: "May 14", time: "8-10am" }, // Fallback matches W Only
+                        "Thursday": { date: "May 15", time: "8-10am" }, // Fallback matches Th Only
+                        "Friday": { date: "May 16", time: "8-10am" }   // Fallback matches F Only
+                    },
+                    "8:55-9:54am": {
+                        "Monday,Wednesday,Friday": { date: "May 14", time: "8-10am" },
+                        "Monday,Wednesday": { date: "May 14", time: "8-10am" },
+                        "Tuesday,Thursday": { date: "May 15", time: "8-10am" },
+                        "MondayOnly": { date: "May 12", time: "8-10am" },
+                        "TuesdayOnly": { date: "May 13", time: "8-10am" },
+                        "WednesdayOnly": { date: "May 14", time: "8-10am" },
+                        "ThursdayOnly": { date: "May 15", time: "8-10am" },
+                        "FridayOnly": { date: "May 16", time: "8-10am" },
+                        "Monday": { date: "May 12", time: "8-10am" }, // Fallback matches M Only
+                        "Tuesday": { date: "May 13", time: "8-10am" }, // Fallback matches T Only
+                        "Wednesday": { date: "May 14", time: "8-10am" }, // Fallback matches MWF/MW/W Only
+                        "Thursday": { date: "May 15", time: "8-10am" }, // Fallback matches TTh/Th Only
+                        "Friday": { date: "May 16", time: "8-10am" }   // Fallback matches F Only
+                    },
+                    "9:55-10:54am": {
+                        "Monday,Wednesday,Friday": { date: "May 12", time: "10:15am-12:15pm" },
+                        "Monday,Wednesday": { date: "May 12", time: "10:15am-12:15pm" },
+                        "Tuesday,Thursday": { date: "May 13", time: "10:15am-12:15pm" },
+                        "MondayOnly": { date: "May 12", time: "10:15am-12:15pm" },
+                        "TuesdayOnly": { date: "May 13", time: "10:15am-12:15pm" },
+                        "WednesdayOnly": { date: "May 14", time: "10:15am-12:15pm" },
+                        "ThursdayOnly": { date: "May 15", time: "10:15am-12:15pm" },
+                        "FridayOnly": { date: "May 16", time: "10:15am-12:15pm" },
+                        "Monday": { date: "May 12", time: "10:15am-12:15pm" }, // Fallback matches MWF/MW/M Only
+                        "Tuesday": { date: "May 13", time: "10:15am-12:15pm" }, // Fallback matches TTh/T Only
+                        "Wednesday": { date: "May 14", time: "10:15am-12:15pm" }, // Fallback matches W Only
+                        "Thursday": { date: "May 15", time: "10:15am-12:15pm" }, // Fallback matches Th Only
+                        "Friday": { date: "May 16", time: "10:15am-12:15pm" }   // Fallback matches F Only
+                    },
+                    "10:55-11:54am": {
+                        "Monday,Wednesday,Friday": { date: "May 14", time: "10:15am-12:15pm" },
+                        "Monday,Wednesday": { date: "May 14", time: "10:15am-12:15pm" },
+                        "Tuesday,Thursday": { date: "May 15", time: "10:15am-12:15pm" },
+                        "MondayOnly": { date: "May 12", time: "10:15am-12:15pm" },
+                        "TuesdayOnly": { date: "May 13", time: "10:15am-12:15pm" },
+                        "WednesdayOnly": { date: "May 14", time: "10:15am-12:15pm" },
+                        "ThursdayOnly": { date: "May 15", time: "10:15am-12:15pm" },
+                        "FridayOnly": { date: "May 16", time: "10:15am-12:15pm" },
+                        "Monday": { date: "May 12", time: "10:15am-12:15pm" }, // Fallback matches M Only
+                        "Tuesday": { date: "May 13", time: "10:15am-12:15pm" }, // Fallback matches T Only
+                        "Wednesday": { date: "May 14", time: "10:15am-12:15pm" }, // Fallback matches MWF/MW/W Only
+                        "Thursday": { date: "May 15", time: "10:15am-12:15pm" }, // Fallback matches TTh/Th Only
+                        "Friday": { date: "May 16", time: "10:15am-12:15pm" }   // Fallback matches F Only
+                    },
+                    "11:55-12:54pm": {
+                        "Monday,Wednesday,Friday": { date: "May 12", time: "12:30-2:30pm" },
+                        "Monday,Wednesday": { date: "May 12", time: "12:30-2:30pm" },
+                        "Tuesday,Thursday": { date: "May 13", time: "12:30-2:30pm" },
+                        "MondayOnly": { date: "May 12", time: "12:30-2:30pm" },
+                        "TuesdayOnly": { date: "May 13", time: "12:30-2:30pm" },
+                        "WednesdayOnly": { date: "May 14", time: "12:30-2:30pm" },
+                        "ThursdayOnly": { date: "May 15", time: "12:30-2:30pm" },
+                        "FridayOnly": { date: "May 16", time: "12:30-2:30pm" },
+                        "Monday": { date: "May 12", time: "12:30-2:30pm" }, // Fallback matches MWF/MW/M Only
+                        "Tuesday": { date: "May 13", time: "12:30-2:30pm" }, // Fallback matches TTh/T Only
+                        "Wednesday": { date: "May 14", time: "12:30-2:30pm" }, // Fallback matches W Only
+                        "Thursday": { date: "May 15", time: "12:30-2:30pm" }, // Fallback matches Th Only
+                        "Friday": { date: "May 16", time: "12:30-2:30pm" }   // Fallback matches F Only
+                    },
+                    "12:55-1:54pm": {
+                        "Monday,Wednesday,Friday": { date: "May 14", time: "12:30-2:30pm" },
+                        "Monday,Wednesday": { date: "May 14", time: "12:30-2:30pm" },
+                        "Tuesday,Thursday": { date: "May 15", time: "12:30-2:30pm" },
+                        "MondayOnly": { date: "May 12", time: "12:30-2:30pm" },
+                        "TuesdayOnly": { date: "May 13", time: "12:30-2:30pm" },
+                        "WednesdayOnly": { date: "May 14", time: "12:30-2:30pm" },
+                        "ThursdayOnly": { date: "May 15", time: "12:30-2:30pm" },
+                        "FridayOnly": { date: "May 16", time: "12:30-2:30pm" },
+                        "Monday": { date: "May 12", time: "12:30-2:30pm" }, // Fallback matches M Only
+                        "Tuesday": { date: "May 13", time: "12:30-2:30pm" }, // Fallback matches T Only
+                        "Wednesday": { date: "May 14", time: "12:30-2:30pm" }, // Fallback matches MWF/MW/W Only
+                        "Thursday": { date: "May 15", time: "12:30-2:30pm" }, // Fallback matches TTh/Th Only
+                        "Friday": { date: "May 16", time: "12:30-2:30pm" }   // Fallback matches F Only
+                    },
+                    "1:55-2:54pm": {
+                        "Monday,Wednesday,Friday": { date: "May 12", time: "2:45-4:45pm" },
+                        "Monday,Wednesday": { date: "May 12", time: "2:45-4:45pm" },
+                        "Tuesday,Thursday": { date: "May 13", time: "2:45-4:45pm" },
+                        "MondayOnly": { date: "May 12", time: "2:45-4:45pm" },
+                        "TuesdayOnly": { date: "May 13", time: "2:45-4:45pm" },
+                        "WednesdayOnly": { date: "May 14", time: "2:45-4:45pm" },
+                        "ThursdayOnly": { date: "May 15", time: "2:45-4:45pm" },
+                        "FridayOnly": { date: "May 16", time: "2:45-4:45pm" },
+                        "Monday": { date: "May 12", time: "2:45-4:45pm" }, // Fallback matches MWF/MW/M Only
+                        "Tuesday": { date: "May 13", time: "2:45-4:45pm" }, // Fallback matches TTh/T Only
+                        "Wednesday": { date: "May 14", time: "2:45-4:45pm" }, // Fallback matches W Only
+                        "Thursday": { date: "May 15", time: "2:45-4:45pm" }, // Fallback matches Th Only
+                        "Friday": { date: "May 16", time: "2:45-4:45pm" }   // Fallback matches F Only
+                    },
+                    "2:55-4:29pm": {
+                        "Monday,Wednesday,Friday": { date: "May 14", time: "2:45-4:45pm" },
+                        "Monday,Wednesday": { date: "May 14", time: "2:45-4:45pm" },
+                        "Tuesday,Thursday": { date: "May 15", time: "2:45-4:45pm" },
+                        "MondayOnly": { date: "May 12", time: "2:45-4:45pm" },
+                        "TuesdayOnly": { date: "May 13", time: "2:45-4:45pm" },
+                        "WednesdayOnly": { date: "May 14", time: "2:45-4:45pm" },
+                        "ThursdayOnly": { date: "May 15", time: "2:45-4:45pm" },
+                        "FridayOnly": { date: "May 16", time: "2:45-4:45pm" },
+                        "Monday": { date: "May 12", time: "2:45-4:45pm" }, // Fallback matches M Only
+                        "Tuesday": { date: "May 13", time: "2:45-4:45pm" }, // Fallback matches T Only
+                        "Wednesday": { date: "May 14", time: "2:45-4:45pm" }, // Fallback matches MWF/MW/W Only
+                        "Thursday": { date: "May 15", time: "2:45-4:45pm" }, // Fallback matches TTh/Th Only
+                        "Friday": { date: "May 16", time: "2:45-4:45pm" }   // Fallback matches F Only
+                    },
+                    "4:30-5:59pm": {
+                        "Monday,Wednesday,Friday": { date: "May 12", time: "5-7pm" },
+                        "Monday,Wednesday": { date: "May 12", time: "5-7pm" },
+                        "Tuesday,Thursday": { date: "May 13", time: "5-7pm" },
+                        "MondayOnly": { date: "May 12", time: "5-7pm" },
+                        "TuesdayOnly": { date: "May 13", time: "5-7pm" },
+                        "WednesdayOnly": { date: "May 14", time: "5-7pm" },
+                        "ThursdayOnly": { date: "May 15", time: "5-7pm" },
+                        "FridayOnly": { date: "May 16", time: "5-7pm" },
+                        "Monday": { date: "May 12", time: "5-7pm" }, // Fallback matches MWF/MW/M Only
+                        "Tuesday": { date: "May 13", time: "5-7pm" }, // Fallback matches TTh/T Only
+                        "Wednesday": { date: "May 14", time: "5-7pm" }, // Fallback matches W Only
+                        "Thursday": { date: "May 15", time: "5-7pm" }, // Fallback matches Th Only
+                        "Friday": { date: "May 16", time: "5-7pm" }   // Fallback matches F Only
+                    },
+                    "6:00-7:19pm": {
+                        "Monday,Wednesday,Friday": { date: "May 14", time: "7:15-9:15pm" },
+                        "Monday,Wednesday": { date: "May 14", time: "7:15-9:15pm" },
+                        "Tuesday,Thursday": { date: "May 15", time: "7:15-9:15pm" },
+                        "MondayOnly": { date: "May 12", time: "7:15-9:15pm" },
+                        "TuesdayOnly": { date: "May 13", time: "7:15-9:15pm" },
+                        "WednesdayOnly": { date: "May 14", time: "7:15-9:15pm" },
+                        "ThursdayOnly": { date: "May 15", time: "7:15-9:15pm" },
+                        "FridayOnly": { date: "May 16", time: "7:15-9:15pm" },
+                        "Monday": { date: "May 12", time: "7:15-9:15pm" }, // Fallback matches M Only
+                        "Tuesday": { date: "May 13", time: "7:15-9:15pm" }, // Fallback matches T Only
+                        "Wednesday": { date: "May 14", time: "7:15-9:15pm" }, // Fallback matches MWF/MW/W Only
+                        "Thursday": { date: "May 15", time: "7:15-9:15pm" }, // Fallback matches TTh/Th Only
+                        "Friday": { date: "May 16", time: "7:15-9:15pm" }   // Fallback matches F Only
+                    },
+                    "7:20-9:29pm": {
+                        "Monday,Wednesday,Friday": { date: "May 12", time: "7:15-9:15pm" },
+                        "Monday,Wednesday": { date: "May 12", time: "7:15-9:15pm" },
+                        "Tuesday,Thursday": { date: "May 13", time: "7:15-9:15pm" },
+                        "MondayOnly": { date: "May 12", time: "7:15-9:15pm" },
+                        "TuesdayOnly": { date: "May 13", time: "7:15-9:15pm" },
+                        "WednesdayOnly": { date: "May 14", time: "7:15-9:15pm" },
+                        "ThursdayOnly": { date: "May 15", time: "7:15-9:15pm" },
+                        "FridayOnly": { date: "May 16", time: "7:15-9:15pm" },
+                        "Monday": { date: "May 12", time: "7:15-9:15pm" }, // Fallback matches MWF/MW/M Only
+                        "Tuesday": { date: "May 13", time: "7:15-9:15pm" }, // Fallback matches TTh/T Only
+                        "Wednesday": { date: "May 14", time: "7:15-9:15pm" }, // Fallback matches W Only
+                        "Thursday": { date: "May 15", time: "7:15-9:15pm" }, // Fallback matches Th Only
+                        "Friday": { date: "May 16", time: "7:15-9:15pm" }   // Fallback matches F Only
+                    }
+                };
+
+                // Determine the pattern key based on selected days more robustly
+                daysSelected.sort(); // Sort to handle different selection orders (e.g., Wed, Mon)
+                let patternKey;
+                const keyString = daysSelected.join(','); // Create a consistent key string
+
+                // --- Direct Matches based on Image Columns ---
+                if (keyString === "Monday,Wednesday,Friday") {
+                    patternKey = "Monday,Wednesday,Friday";
+                } else if (keyString === "Monday,Wednesday") {
+                    patternKey = "Monday,Wednesday";
+                } else if (keyString === "Tuesday,Thursday") {
+                    patternKey = "Tuesday,Thursday";
+                } else if (daysSelected.length === 1) {
+                    patternKey = daysSelected[0] + "Only"; // MondayOnly, TuesdayOnly etc.
+                // --- Rule from Image Text: "All sections that include both Tuesday and Thursday should follow the Tuesday and Thursday exam schedule" ---
+                } else if (daysSelected.includes("Tuesday") && daysSelected.includes("Thursday")) {
+                    patternKey = "Tuesday,Thursday"; // Prioritize T/Th rule
+                // --- Fallback / Other combinations (Using first day, matching image logic where possible) ---
+                } else {
+                    // Default to the first day selected if no specific pattern matches
+                    // The fallback entries added to examScheduleData handle this
+                    patternKey = daysSelected[0];
+                }
+
+
+                // Get exam schedule info, handle potential undefined lookups
+                const timeSlotData = examScheduleData[startTime];
+                if (!timeSlotData) {
+                    console.error(`No data found for start time: ${startTime}`);
+                    return {
+                        date: "Error",
+                        time: "Invalid start time selected"
+                    };
+                }
+
+                const examInfo = timeSlotData[patternKey];
+
+                if (examInfo) {
+                    return {
+                        date: `${examInfo.date}, 2025`, // Year from image title
+                        time: examInfo.time
+                    };
+                } else {
+                    // This fallback might occur if the patternKey logic generates something unexpected
+                    // or if a specific combination is truly missing from the schedule.
+                    console.warn(`No specific exam info found for patternKey: ${patternKey} at startTime: ${startTime}. Checking basic day fallback.`);
+                    // Try falling back to the first day without "Only"
+                    const fallbackKey = daysSelected[0];
+                    const fallbackInfo = timeSlotData[fallbackKey];
+                    if (fallbackInfo) {
+                        console.log(`Using fallback info for day: ${fallbackKey}`);
+                        return {
+                            date: `${fallbackInfo.date}, 2025`,
+                            time: fallbackInfo.time
+                        };
+                    } else {
+                        console.error(`Could not find any schedule for startTime: ${startTime} and days: ${daysSelected.join(',')}`);
+                        return {
+                            date: "Schedule not found",
+                            time: "Please check with your instructor"
+                        };
+                    }
+                }
+            }
+        });
+    </script>
+    </body>
