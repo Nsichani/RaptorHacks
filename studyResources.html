@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Resources - Finals Buddy</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #3730a3;
+            --secondary: #6366f1;
+            --accent: #a5b4fc;
+            --light: #f8fafc;
+            --dark: #1e1b4b;
+            --success: #10b981;
+            --warning: #f59e0b;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #334155;
+            background-color: var(--light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+        }
+        
+        .logo-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .logo {
+            font-size: 3rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .tagline {
+            font-size: 1.2rem;
+            font-style: italic;
+            opacity: 0.9;
+        }
+        
+        .hero {
+            background: linear-gradient(rgba(79, 70, 229, 0.9), rgba(55, 48, 163, 0.9)), url("/api/placeholder/1200/500") no-repeat center center;
+            background-size: cover;
+            padding: 4rem 2rem;
+            text-align: center;
+            color: white;
+        }
+        
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .hero-text {
+            max-width: 800px;
+            margin: 0 auto;
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+        
+        .section-title {
+            font-size: 2rem;
+            color: var(--dark);
+            margin-bottom: 3rem;
+            position: relative;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .section-title::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background-color: var(--secondary);
+            border-radius: 2px;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .resource-category {
+            margin-bottom: 4rem;
+        }
+        
+        .category-title {
+            font-size: 1.5rem;
+            color: var(--primary-dark);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--accent);
+        }
+        
+        .resource-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+        
+        .resource-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .resource-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12);
+        }
+        
+        .resource-thumbnail {
+            width: 100%;
+            height: 200px;
+            background-color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .resource-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .resource-content {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+        
+        .resource-title {
+            font-size: 1.2rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .resource-source {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-bottom: 1rem;
+        }
+        
+        .resource-desc {
+            margin-bottom: 1.5rem;
+            flex-grow: 1;
+        }
+        
+        .resource-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .tag {
+            background-color: #e2e8f0;
+            color: #475569;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--secondary);
+            color: white;
+            text-decoration: none;
+            padding: 0.9rem 1.8rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        
+        .btn:hover {
+            background-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+        }
+        
+        .search-container {
+            max-width: 600px;
+            margin: 0 auto 3rem auto;
+        }
+        
+        .search-box {
+            display: flex;
+            width: 100%;
+        }
+        
+        .search-input {
+            flex-grow: 1;
+            padding: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px 0 0 8px;
+            font-size: 1rem;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--secondary);
+        }
+        
+        .search-btn {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 0 8px 8px 0;
+            padding: 0 1.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .search-btn:hover {
+            background-color: var(--primary);
+        }
+        
+        .filter-container {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            background-color: white;
+            border: 2px solid var(--accent);
+            color: var(--primary-dark);
+            padding: 0.5rem 1.25rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .filter-btn:hover, .filter-btn.active {
+            background-color: var(--accent);
+            color: var(--dark);
+        }
+        
+        footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            margin-top: auto;
+        }
+        
+        .footer-links {
+            margin-bottom: 1rem;
+        }
+        
+        .footer-links a {
+            color: var(--accent);
+            text-decoration: none;
+            margin: 0 0.75rem;
+        }
+        
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+        
+        .copyright {
+            opacity: 0.75;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 2.5rem;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .resource-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-container {
+                padding: 0 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <div class="logo">Finals Buddy</div>
+            <div class="tagline">The only friend you'll need during finals week</div>
+        </div>
+    </header>
+    
+    <section class="hero">
+        <h1>Study Resources</h1>
+        <p class="hero-text">Discover the best online resources to help you ace your finals. From video tutorials and practice exams to study guides and interactive tools, we've curated everything you need for successful exam preparation.</p>
+    </section>
+    
+    <div class="container">
+        <div class="search-container">
+            <div class="search-box">
+                <input type="text" class="search-input" placeholder="Search for resources..." id="search-resources">
+                <button class="search-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        
+        <div class="filter-container">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="video">Videos</button>
+            <button class="filter-btn" data-filter="practice">Practice Tests</button>
+            <button class="filter-btn" data-filter="notes">Study Notes</button>
+            <button class="filter-btn" data-filter="interactive">Interactive</button>
+        </div>
+        
+        <div class="text-center">
+            <h2 class="section-title">Top Study Resources</h2>
+        </div>
+        
+        <div class="resource-category">
+            <h3 class="category-title">Math &amp; Science</h3>
+            
+            <div class="resource-grid">
+                <div class="resource-card" data-type="video">
+                    <div class="resource-thumbnail">
+                        <img src="/api/placeholder/350/200" alt="Khan Academy Calculus">
+                    </div>
+                    <div class="resource-content">
+                        <h4 class="resource-title">Calculus Made Easy</h4>
+                        <p class="resource-source">Khan Academy</p>
+                        <p class="resource-desc">Comprehensive video series covering all major calculus topics with step-by-step explanations and practice problems.</p>
+                        <div class="resource-tags">
+                            <span class="tag">Calculus</span>
+                            <span class="tag">Video Tutorials</span>
+                            <span class="tag">Free</span>
+                        </div>
+                        <a href="https://www.khanacademy.org/math/calculus-1" class="btn" target="_blank">Watch Now</a>
+                    </div>
+                </div>
+                
+                <div class="resource-card" data-type="interactive">
+                    <div class="resource-thumbnail">
+                        <img src="/api/placeholder/350/200" alt="Physics Simulations">
+                    </div>
+                    <div class="resource-content">
+                        <h4 class="resource-title">Interactive Physics Simulations</h4>
+                        <p class="resource-source">PhET Interactive Simulations</p>
+                        <p class="resource-desc">Fun, interactive, research-based simulations of physics phenomena from the University of Colorado Boulder.</p>
+                        <div class="resource-tags">
+                            <span class="tag">Physics</span>
+                            <span class="tag">Interactive</span>
+                            <span class="tag">Free</span>
+                        </div>
+                        <a href="https://phet.colorado.edu/en/simulations/category/physics" class="btn" target="_blank">Try It</a>
+                    </div>
+                </div>
+                
+                <div class="resource-card" data-type="practice">
+                    <div class="resource-thumbnail">
+                        <img src="/api/placeholder/350/200" alt="Chemistry Practice Tests">
+                    </div>
+                    <div class="resource-content">
+                        <h4 class="resource-title">Chemistry Practice Exams</h4>
+                        <p class="resource-source">ACS Chemistry</p>
+                        <p class="resource-desc">Full-length practice exams with detailed solutions for general, organic, and physical chemistry courses.</p>
+                        <div class="resource-tags">
+                            <span class="tag">Chemistry</span>
+                            <span class="tag">Practice Tests</span>
+                            <span class="tag">Comprehensive</span>
+                        </div>
+                        <a href="https://www.acs.org/education/students/highschool/chemistryclubs/activities/chemistry-practice-tests.html" class="btn" target="_blank">Practice Now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="resource-category">
+            <h3 class="category-title">Humanities &amp; Social Sciences</h3>
+            
+            <div class="resource-grid">
+                <div class="resource-card" data-type="notes">
+                    <div class="resource-thumbnail">
+                        <img src="/api/placeholder/350/200" alt="History Study Guides">
+                    </div>
+                    <div class="resource-content">
+                        <h4 class="resource-title">Comprehensive History Study Guides</h4>
+                        <p class="resource-source">CrashCourse</p>
+                        <p class="resource-desc">In-depth study guides covering world history, US history, and European history with timelines and key concept summaries.</p>
+                        <div class="resource-tags">
+                            <span class="tag">History</span>
+                            <span class="tag">Study Notes</span>
+                            <span class="tag">Comprehensive</span>
+                        </div>
+                        <a href="https://thecrashcourse.com/courses/worldhistory" class="btn" target="_blank">View Guides</a>
+                    </div>
+                </div>
+                
+                <div class="resource-card" data-type="video">
+                    <div class="resource-thumbnail">
+                        <img src="/api/placeholder/350/200" alt="Psychology Videos">
+                    </div>
+                    <div class="resource-content">
+                        <h4 class="resource-title">Psychology Crash Course</h4>
+                        <p class="resource-source">YouTube - CrashCourse</p>
+                        <p class="resource-desc">Fast-paced, engaging video series covering all major topics in introductory psychology courses.</p>
+                        <div class="resource-tags">
+                            <span class="tag">Psychology</span>
+                            <span class="tag">Video Tutorials</span>
+                            <span class="tag">Free</span>
+                        </div>
+                        <a href="https://www.youtube.com/playlist?list=PL8dPuuaLjXtOPRKzVLY0jJY-uHOH9KVU6" class="btn" target="_blank">Watch Now</a>
+                    </div>
+                </div>
+                
+                <div class="resource-card" data-type="interactive">
+                    <div class="resource-thumbnail">
+                        <img src="/api/placeholder/350/200" alt="Literature Analysis">
+                    </div>
+                    <div class="resource-content">
+                        <h4 class="resource-title">Literature Analysis Tool</h4>
+                        <p class="resource-source">LitCharts</p>
+                        <p class="resource-desc">Interactive summaries, analysis, themes, character maps, and quotes for hundreds of literary works commonly studied in college courses.</p>
+                        <div class="resource-tags">
+                            <span class="tag">Literature</span>
+                            <span class="tag">Analysis</span>
+                            <span class="tag">Interactive</span>
+                        </div>
+                        <a href="https://www.litcharts.com/" class="btn" target="_blank">Analyze Now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="resource-category">
+            <h3 class="category-title">Business &amp; Economics</h3>
+            
+            <div class="resource-grid">
+                <div class="resource-card" data-type="video">
+                    <div class="resource-thumbnail">
+                        <img src="/api/placeholder/350/200" alt="Economics Videos">
+                    </div>
+                    <div class="resource-content">
+                        <h4 class="resource-title">Economics Explained</h4>
+                        <p class="resource-source">YouTube - Economics Explained</p>
+                        <p class="resource-desc">Clear, concise explanations of complex economic concepts and theories with real-world applications and case studies.</p>
+                        <div class="resource-tags">
+                            <span class="tag">Economics</span>
+                            <span class="tag">Video Tutorials</span>
+                            <span class="tag">Free</span>
+                        </div>
+                        <a href="https://www.youtube.com/c/EconomicsExplained" class="btn" target="_blank">Watch Now</a>
+                    </div>
+                </div>
+                
+                <div class="resource-card" data-type="practice">
+                    <div class="resource-thumbnail">
+                        <img src="/api/placeholder/350/200" alt="Accounting Practice">
+                    </div>
+                    <div class="resource-content">
+                        <h4 class="resource-title">Accounting Practice Problems</h4>
+                        <p class="resource-source">AccountingCoach</p>
+                        <p class="resource-desc">Extensive collection of accounting exercises, problems, and practice quizzes with detailed solutions and explanations.</p>
+                        <div class="resource-tags">
+                            <span class="tag">Accounting</span>
+                            <span class="tag">Practice Tests</span>
+                            <span class="tag">Comprehensive</span>
+                        </div>
+                        <a href="https://www.accountingcoach.com/accounting-quizzes" class="btn" target="_blank">Practice Now</a>
+                    </div>
+                </div>
+                
+                <div class="resource-card" data-type="notes">
+                    <div class="resource-thumbnail">
+                        <img src="/api/placeholder/350/200" alt="Marketing Guides">
+                    </div>
+                    <div class="resource-content">
+                        <h4 class="resource-title">Marketing Concept Summaries</h4>
+                        <p class="resource-source">HubSpot Academy</p>
+                        <p class="resource-desc">Concise study guides covering key marketing concepts, frameworks, and strategies with practical examples and case studies.</p>
+                        <div class="resource-tags">
+                            <span class="tag">Marketing</span>
+                            <span class="tag">Study Notes</span>
+                            <span class="tag">Free</span>
+                        </div>
+                        <a href="https://academy.hubspot.com/courses" class="btn" target="_blank">View Guides</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="resource-category">
+            <h3 class="category-title">Computer Science &amp; Programming</h3>
+            
+            <div class="resource-grid">
+                <div class="resource-card" data-type="interactive">
+                    <div class="resource-thumbnail">
+                        <img src="/api/placeholder/350/200" alt="Coding Practice">
+                    </div>
+                    <div class="resource-content">
+                        <h4 class="resource-title">Interactive Coding Practice</h4>
+                        <p class="resource-source">LeetCode</p>
+                        <p class="resource-desc">Platform with hundreds of coding challenges to practice algorithms, data structures, and problem-solving skills for technical interviews and exams.</p>
+                        <div class="resource-tags">
+                            <span class="tag">Programming</span>
+                            <span class="tag">Interactive</span>
+                            <span class="tag">Practice</span>
+                        </div>
+                        <a href="https://leetcode.com/problemset/all/" class="btn" target="_blank">Code Now</a>
+                    </div>
+                </div>
+                
+                <div class="resource-card" data-type="video">
+                    <div class="resource-thumbnail">
+                        <img src="/api/placeholder/350/200" alt="Data Structures Videos">
+                    </div>
+                    <div class="resource-content">
+                        <h4 class="resource-title">Data Structures &amp; Algorithms</h4>
+                        <p class="resource-source">YouTube - freeCodeCamp</p>
+                        <p class="resource-desc">Comprehensive video tutorials on data structures and algorithms with visualizations and coding examples in multiple languages.</p>
+                        <div class="resource-tags">
+                            <span class="tag">Computer Science</span>
+                            <span class="tag">Video Tutorials</span>
+                            <span class="tag">Free</span>
+                        </div>
+                        <a href="https://www.youtube.com/c/Freecodecamp" class="btn" target="_blank">Watch Now</a>
+                    </div>
+                </div>
+                
+                <div class="resource-card" data-type="notes">
+                    <div class="resource-thumbnail">
+                        <img src="/api/placeholder/350/200" alt="Web Development Cheatsheets">
+                    </div>
+                    <div class="resource-content">
+                        <h4 class="resource-title">Web Development Cheatsheets</h4>
+                        <p class="resource-source">DevDocs</p>
+                        <p class="resource-desc">Collection of API documentation and quick reference guides for HTML, CSS, JavaScript, and popular frameworks and libraries.</p>
+                        <div class="resource-tags">
+                            <span class="tag">Web Development</span>
+                            <span class="tag">Reference</span>
+                            <span class="tag">Free</span>
+                        </div>
+                        <a href="https://devdocs.io/" class="btn" target="_blank">View Docs</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="footer-links">
+            <a href="homePage.html">Home</a>
+            <a href="nima.html">Exam Schedule</a>
+            <a href="gradeCalc.html">Grade Calculator</a>
+            <a href="studyResources.html">Study Resources</a>
+        </div>
+        <div class="copyright">© 2025 Finals Buddy. Created by students, for students.</div>
+    </footer>
+
+    <script>
+        // Resource filtering functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            const resourceCards = document.querySelectorAll('.resource-card');
+            const searchInput = document.getElementById('search-resources');
+            
+            // Filter resources by category
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Update active button
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const filter = this.getAttribute('data-filter');
+                    
+                    resourceCards.forEach(card => {
+                        if (filter === 'all' || card.getAttribute('data-type') === filter) {
+                            card.style.display = 'flex';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                });
+            });
+            
+            // Search functionality
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                
+                resourceCards.forEach(card => {
+                    const title = card.querySelector('.resource-title').textContent.toLowerCase();
+                    const desc = card.querySelector('.resource-desc').textContent.toLowerCase();
+                    const source = card.querySelector('.resource-source').textContent.toLowerCase();
+                    const tags = Array.from(card.querySelectorAll('.tag')).map(tag => tag.textContent.toLowerCase());
+                    
+                    // Check if any content matches the search term
+                    if (
+                        title.includes(searchTerm) || 
+                        desc.includes(searchTerm) || 
+                        source.includes(searchTerm) || 
+                        tags.some(tag => tag.includes(searchTerm))
+                    ) {
+                        card.style.display = 'flex';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
