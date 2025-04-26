@@ -353,6 +353,9 @@
 	<audio id="ariaMath">
         	<source src="AriaMath.mp3" type="audio/mpeg">
 	</audio>
+	<audio id="sweeden">
+        	<source src="Sweeden.mp3" type="audio/mpeg">
+	</audio>
         <div class="pomodoro-settings">
             <h3 class="settings-title">Timer Settings</h3>
             <div class="settings-grid">
@@ -434,6 +437,7 @@
         const progressBar = document.getElementById('progress-bar');
         const saveSettingsBtn = document.getElementById('save-settings');
 	var ariaMath = document.getElementById("ariaMath");
+	var sweeden = document.getElementById("sweeden");
         
         // Format time function (converts seconds to MM:SS format)
         function formatTime(seconds) {
@@ -466,7 +470,14 @@
         
         // Start timer function
         function startTimer() {
-	    ariaMath.play();
+	    var min = 1;
+ 	    var max = 2;
+  	    var randomNum = Math.floor(Math.random() * (max - min + 1)) + min;
+	    if (randomNum == 1) {
+	    	ariaMath.play();
+	    } else if (randomNum == 2) {
+		sweeden.play();
+	    }
             isRunning = true;
             startBtn.disabled = true;
             pauseBtn.disabled = false;
@@ -515,6 +526,7 @@
             clearInterval(timerInterval);
             isRunning = false;
 	    ariaMath.pause();
+   	    sweeden.pause();
             startBtn.disabled = false;
             pauseBtn.disabled = true;
         }
