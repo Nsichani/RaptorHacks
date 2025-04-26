@@ -33,11 +33,16 @@
         }
         
         header {
-            background-color: var(--primary);
-            color: white;
-            padding: 2rem 0;
-            text-align: center;
-        }
+			background-color: var(--primary);
+			color: white;
+			text-align: center;
+			padding: 1.5rem;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			flex-wrap: wrap;
+			gap: 1rem;
+		}
         
         .logo-container {
             display: flex;
@@ -47,11 +52,9 @@
         }
         
         .logo {
-            font-size: 3rem;
-            font-weight: 800;
-            letter-spacing: -1px;
-            margin-bottom: 0.5rem;
-        }
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
         
         .tagline {
             font-size: 1.2rem;
@@ -326,15 +329,36 @@
                 padding: 0 1rem;
             }
         }
+
+        .nav-links {
+        display: flex;
+        gap: 1.5rem;
+    }
+        .nav-links a {
+        color: white;
+        text-decoration: none;
+        font-weight: 600;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        transition: background-color 0.2s, opacity 0.2s;
+    }
+
+    .nav-links a:hover {
+        background-color: var(--secondary);
+        opacity: 0.8;
+    }
     </style>
 </head>
 <body>
     <header>
-        <div class="logo-container">
-            <div class="logo">Finals Buddy</div>
-            <div class="tagline">The only friend you'll need during finals week</div>
-        </div>
-    </header>
+    <div class="logo">Finals Buddy</div>
+    <div class="nav-links">
+        <a href="homePage.html">Home</a>
+        <a href="nima.html">Exam Schedule</a>
+        <a href="gradeCalc.html">Grade Calculator</a>
+        <a href="pomodoroTimer.html">Pomodoro Timer</a>
+    </div>
+</header>
     
     <section class="hero">
         <h1>Study Resources</h1>
